@@ -36,7 +36,7 @@
     "ext-spl": "*",
     "lib-curl": "*",
 
-    "laminas/laminas-mvc": "*",
+    "laminas/laminas-mvc": "*"
   },
   "suggest": {
     "ext-apc": "for opcode cache and system persistent data",
