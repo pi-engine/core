@@ -1,0 +1,47 @@
+{
+  "name": "pi/core",
+  "description": "Pi is a multi-tenant application development engine for cloud ready SaaS platform with support for SSO/OAuth.",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "Pi",
+    "Pi Engine",
+    "Laminas",
+    "ZendFramework",
+    "MultiTenant",
+    "SaaS"
+  ],
+  "homepage": "http://piengine.org",
+  "authors": [
+    {
+      "name": "Taiwen Jiang",
+      "email": "taiwen@me.com"
+    },
+    {
+      "name": "Hossein Azizabadi Farahani",
+      "email": "hossein@azizabadi.com"
+    },
+    {
+      "name": "Pi Team",
+      "homepage": "https://github.com/pi-engine/pi/graphs/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.4 || ~8.0.0",
+    "ext-ctype": "*",
+    "ext-fileinfo": "*",
+    "ext-gd": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-pdo": "*",
+    "ext-spl": "*",
+    "lib-curl": "*",
+
+    "laminas/laminas-mvc": "*",
+  },
+  "suggest": {
+    "ext-apc": "for opcode cache and system persistent data",
+    "ext-discount": "for Markdown text parsing",
+    "ext-intl": "for i18n features"
+  },
+  "minimum-stability": "dev"
+}
