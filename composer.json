@@ -6,7 +6,6 @@
     "Pi",
     "Pi Engine",
     "Laminas",
-    "ZendFramework",
     "MultiTenant",
     "SaaS"
   ],
@@ -36,7 +35,8 @@
     "ext-spl": "*",
     "lib-curl": "*",
 
-    "laminas/laminas-mvc": "*"
+    "laminas/laminas-mvc": "*",
+    "laminas/laminas-view": "*"
   },
   "suggest": {
     "ext-apc": "for opcode cache and system persistent data",
