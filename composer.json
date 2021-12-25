@@ -36,7 +36,8 @@
     "lib-curl": "*",
 
     "laminas/laminas-mvc": "*",
-    "laminas/laminas-view": "*"
+    "phpseclib/phpseclib": "~3.0"
+
   },
   "suggest": {
     "ext-apc": "for opcode cache and system persistent data",
