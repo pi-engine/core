@@ -36,7 +36,18 @@
     "lib-curl": "*",
 
     "laminas/laminas-mvc": "*",
-    "phpseclib/phpseclib": "~3.0"
+    "laminas/laminas-mvc-middleware": "*",
+    "laminas/laminas-servicemanager": "*",
+    "phpseclib/phpseclib": "~3.0",
+    "imagine/imagine": "*",
+    "voku/anti-xss": "*",
+    "phayes/geophp": "*",
+    "emcconville/google-map-polyline-encoding-tool": "*",
+    "raiym/instagram-php-scraper": "*",
+    "bigbluebutton/bigbluebutton-api-php": "*",
+    "phpmailer/phpmailer": "*",
+    "php-ffmpeg/php-ffmpeg": "*",
+    "phpoffice/phpspreadsheet": "*"
 
   },
   "suggest": {
