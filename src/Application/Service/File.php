@@ -14,8 +14,6 @@ use Closure;
 use DirectoryIterator;
 use Exception;
 use FilesystemIterator;
-use Pi\File\Transfer\Download;
-use Pi\File\Transfer\Upload;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Traversable;
