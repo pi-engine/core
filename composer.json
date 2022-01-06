@@ -48,12 +48,17 @@
     "phpmailer/phpmailer": "*",
     "php-ffmpeg/php-ffmpeg": "*",
     "phpoffice/phpspreadsheet": "*"
-
   },
+
+  "autoload": {
+    "psr-4": {
+      "Pi\\Core\\": "src/"
+    }
+  },
+
   "suggest": {
     "ext-apc": "for opcode cache and system persistent data",
     "ext-discount": "for Markdown text parsing",
     "ext-intl": "for i18n features"
-  },
-  "minimum-stability": "dev"
+  }
 }
