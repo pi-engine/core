@@ -14,7 +14,6 @@ use Closure;
 use DirectoryIterator;
 use Exception;
 use FilesystemIterator;
-use Pi;
 use Pi\File\Transfer\Download;
 use Pi\File\Transfer\Upload;
 use RecursiveDirectoryIterator;
@@ -124,42 +123,6 @@ use Traversable;
 class File implements ServiceInterface
 {
     /**
-     * Upload files
-     *
-     * @param array $options
-     * @param bool  $doUpload
-     *
-     * @return Upload
-     * @see Pi\File\Upload
-     */
-    public function upload(array $options = [], $doUpload = true)
-    {
-        $uploader = new Upload($options);
-        if ($doUpload && $uploader->isValid()) {
-            $uploader->receive();
-        }
-
-        return $uploader;
-    }
-
-    /**
-     * Send the file to the client (Download)
-     *
-     * @param string|array $source  File or file meta to download
-     * @param array        $options Options for the file(s) to send
-     *
-     * @return Download
-     * @see Pi\File\Download
-     */
-    public function download($source, array $options = [])
-    {
-        $downloader = new Download;
-        $downloader->send($source, $options);
-
-        return $downloader;
-    }
-
-    /**
      * Transform file size
      *
      * @param int|string $value
@@ -168,7 +131,8 @@ class File implements ServiceInterface
      */
     public function transformSize($value)
     {
-        $sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $result = '';
+        $sizes  = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         if (is_numeric($value)) {
             $value = (int)$value;
             for ($i = 0; $value >= 1024 && $i < 9; $i++) {
@@ -204,13 +168,13 @@ class File implements ServiceInterface
      *
      * @param string $originFile The original filename
      * @param string $targetFile The target filename
-     * @param bool   $override   Whether to override an existing file
+     * @param bool $override Whether to override an existing file
      *
      * @return $this
      *
      * @throws Exception When copy fails
      */
-    public function copy($originFile, $targetFile, $override = false)
+    public function copy(string $originFile, string $targetFile, bool $override = true): File
     {
         $this->mkdir(dirname($targetFile));
 
@@ -239,13 +203,13 @@ class File implements ServiceInterface
      * Creates a directory recursively.
      *
      * @param string|array|Traversable $dirs The directory path
-     * @param int                      $mode The directory mode
+     * @param int $mode The directory mode
      *
      * @return $this
      *
      * @throws Exception On any directory creation failure
      */
-    public function mkdir($dirs, $mode = 0777)
+    public function mkdir($dirs, int $mode = 0777): File
     {
         foreach ($this->toIterator($dirs) as $dir) {
             if (is_dir($dir)) {
@@ -263,12 +227,11 @@ class File implements ServiceInterface
     /**
      * Checks the existence of files or directories.
      *
-     * @param string|array|Traversable $files A filename,
-     *                                        an array of files, or a Traversable instance to check
+     * @param string|array|Traversable $files A filename, an array of files, or a Traversable instance to check
      *
      * @return Bool
      */
-    public function exists($files)
+    public function exists($files): bool
     {
         foreach ($this->toIterator($files) as $file) {
             if (!file_exists($file)) {
@@ -282,18 +245,15 @@ class File implements ServiceInterface
     /**
      * Sets access and modification time of file.
      *
-     * @param string|array|Traversable $files
-     *      A filename, an array of files, or a Traversable instance to create
-     * @param int                      $time
-     *      The touch time as a unix timestamp
-     * @param int                      $atime
-     *      The access time as a unix timestamp
+     * @param string|array|Traversable $files A filename, an array of files, or a Traversable instance to create
+     * @param int|null $time The touch time as a unix timestamp
+     * @param int|null $atime The access time as a unix timestamp
      *
      * @return $this
      *
      * @throws Exception When touch fails
      */
-    public function touch($files, $time = null, $atime = null)
+    public function touch($files, int $time = null, int $atime = null): File
     {
         if (null === $time) {
             $time = time();
@@ -314,8 +274,9 @@ class File implements ServiceInterface
      * @param string|array|Traversable $dirs The directory path
      *
      * @return $this
+     * @throws Exception
      */
-    public function flush($dirs)
+    public function flush($dirs): File
     {
         $dirs = iterator_to_array($this->toIterator($dirs));
         foreach ($dirs as $dir) {
@@ -331,14 +292,13 @@ class File implements ServiceInterface
     /**
      * Removes files or directories.
      *
-     * @param string|array|Traversable $files
-     *      A filename, an array of files, or a Traversable instance to remove
+     * @param string|array|Traversable $files A filename, an array of files, or a Traversable instance to remove
      *
      * @return $this
      *
      * @throws Exception When removal fails
      */
-    public function remove($files)
+    public function remove($files): File
     {
         $files = iterator_to_array($this->toIterator($files));
         $files = array_reverse($files);
@@ -385,19 +345,16 @@ class File implements ServiceInterface
     /**
      * Change mode for an array of files or directories.
      *
-     * @param string|array|Traversable $files
-     *                                        A filename, an array of files,
-     *                                        or a Traversable instance to change mode
-     * @param int                      $mode  The new mode (octal)
-     * @param int                      $umask The mode mask (octal)
-     * @param Bool                     $recursive
-     *                                        Whether change the mod recursively or not
+     * @param string|array|Traversable $files A filename, an array of files, or a Traversable instance to change mode
+     * @param int $mode The new mode (octal)
+     * @param int $umask The mode mask (octal)
+     * @param Bool $recursive Whether change the mod recursively or not
      *
      * @return $this
      *
      * @throws Exception When the change fail
      */
-    public function chmod($files, $mode, $umask = 0000, $recursive = false)
+    public function chmod($files, int $mode, int $umask = 0000, bool $recursive = false): File
     {
         foreach ($this->toIterator($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
@@ -419,18 +376,15 @@ class File implements ServiceInterface
     /**
      * Change the owner of an array of files or directories
      *
-     * @param string|array|Traversable $files
-     *                                       A filename, an array of files,
-     *                                       or a \Traversable instance to change owner
-     * @param string                   $user The new owner user name
-     * @param Bool                     $recursive
-     *                                       Whether change the owner recursively or not
+     * @param string|array|Traversable $files A filename, an array of files, or a \Traversable instance to change owner
+     * @param string $user The new owner username
+     * @param Bool $recursive Whether change the owner recursively or not
      *
      * @return $this
      *
      * @throws Exception When the change fail
      */
-    public function chown($files, $user, $recursive = false)
+    public function chown($files, string $user, bool $recursive = false): File
     {
         foreach ($this->toIterator($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
@@ -457,18 +411,15 @@ class File implements ServiceInterface
     /**
      * Change the group of an array of files or directories
      *
-     * @param string|array|Traversable $files
-     *                                        A filename, an array of files,
-     *                                        or a Traversable instance to change group
-     * @param string                   $group The group name
-     * @param Bool                     $recursive
-     *                                        Whether change the group recursively or not
+     * @param string|array|Traversable $files A filename, an array of files, or a Traversable instance to change group
+     * @param string $group The group name
+     * @param Bool $recursive Whether change the group recursively or not
      *
      * @return $this
      *
      * @throws Exception When the change fail
      */
-    public function chgrp($files, $group, $recursive = false)
+    public function chgrp($files, string $group, bool $recursive = false): File
     {
         foreach ($this->toIterator($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
@@ -503,7 +454,7 @@ class File implements ServiceInterface
      * @throws Exception When target file already exists
      * @throws Exception When origin cannot be renamed
      */
-    public function rename($origin, $target)
+    public function rename(string $origin, string $target): File
     {
         // we check that target does not exist
         if (is_readable($target)) {
@@ -527,22 +478,22 @@ class File implements ServiceInterface
     /**
      * Creates a symbolic link or copy a directory.
      *
-     * @param string $originDir     The origin directory path
-     * @param string $targetDir     The symbolic link name
-     * @param Bool   $copyOnWindows Whether to copy files if on Windows
-     * @param Bool   $override
-     *                              Whether to override existing files
+     * @param string $originDir The origin directory path
+     * @param string $targetDir The symbolic link name
+     * @param Bool $copyOnWindows Whether to copy files if on Windows
+     * @param Bool $override Whether to override existing files
      *
      * @return $this
      *
      * @throws Exception When symlink fails
      */
     public function symlink(
-        $originDir,
-        $targetDir,
-        $copyOnWindows = true,
-        $override = false
-    ) {
+        string $originDir,
+        string $targetDir,
+        bool   $copyOnWindows = true,
+        bool   $override = false
+    ): File
+    {
         if (!function_exists('symlink')
             || (defined('PHP_WINDOWS_VERSION_MAJOR') && $copyOnWindows)
         ) {
@@ -605,12 +556,12 @@ class File implements ServiceInterface
      * Given an existing path,
      * convert it to a path relative to a given starting path
      *
-     * @param string $endPath   Absolute path of target
+     * @param string $endPath Absolute path of target
      * @param string $startPath Absolute path where traversal begins
      *
      * @return string Path of target relative to starting path
      */
-    public function makePathRelative($endPath, $startPath)
+    public function makePathRelative(string $endPath, string $startPath): string
     {
         // Normalize separators on windows
         if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
@@ -659,21 +610,22 @@ class File implements ServiceInterface
      *  - copy_on_windows: Whether to copy files instead of links on Windows
      *      {@see symlink()}.
      *
-     * @param string      $originDir The origin directory
-     * @param string      $targetDir The target directory
-     * @param Traversable $iterator  A Traversable instance
-     * @param array       $options   An array of bool options
+     * @param string $originDir The origin directory
+     * @param string $targetDir The target directory
+     * @param Traversable|null $iterator A Traversable instance
+     * @param array $options An array of bool options
      *
      * @return $this
      *
      * @throws Exception When file type is unknown
      */
     public function mirror(
-        $originDir,
-        $targetDir,
+        string      $originDir,
+        string      $targetDir,
         Traversable $iterator = null,
-        $options = []
-    ) {
+        array $options = []
+    ): File
+    {
         $copyOnWindows = true;
         if (isset($options['copy_on_windows'])
             && defined('PHP_WINDOWS_VERSION_MAJOR')
@@ -729,7 +681,7 @@ class File implements ServiceInterface
      *
      * @return Bool
      */
-    public function isAbsolutePath($file)
+    public function isAbsolutePath(string $file): bool
     {
         //$result = preg_match('|^([a-zA-Z]:)?/|', $path);
         $result = false;
@@ -770,12 +722,12 @@ class File implements ServiceInterface
      * Get file list in a directory
      *
      * @param DirectoryIterator|string $path
-     * @param Closure|null             $filter
-     * @param bool                     $recursive
+     * @param Closure|null $filter
+     * @param bool $recursive
      *
      * @return array
      */
-    public function getList($path, $filter = null, $recursive = false)
+    public function getList($path, Closure $filter = null, bool $recursive = false): array
     {
         $result   = [];
         $iterator = null;
@@ -822,4 +774,40 @@ class File implements ServiceInterface
 
         return $result;
     }
+
+    /**
+     * Upload files
+     *
+     * @param array $options
+     * @param bool $doUpload
+     *
+     * @return Upload
+     * @see Pi\File\Upload
+     */
+    /* public function upload(array $options = [], $doUpload = true)
+    {
+        $uploader = new Upload($options);
+        if ($doUpload && $uploader->isValid()) {
+            $uploader->receive();
+        }
+
+        return $uploader;
+    } */
+
+    /**
+     * Send the file to the client (Download)
+     *
+     * @param string|array $source File or file meta to download
+     * @param array $options Options for the file(s) to send
+     *
+     * @return Download
+     * @see Pi\File\Download
+     */
+    /* public function download($source, array $options = [])
+    {
+        $downloader = new Download;
+        $downloader->send($source, $options);
+
+        return $downloader;
+    } */
 }

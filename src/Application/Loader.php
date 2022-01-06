@@ -9,26 +9,23 @@
 
 namespace Pi\Core\Application;
 
-use Laminas\ServiceManager\Factory\InvokableFactory;
 use Laminas\ServiceManager\ServiceManager;
-use Pi\Core\Application\Service\Audit;
-use Pi\Core\Application\Service\Demo;
+use Laminas\ServiceManager\Factory\InvokableFactory;
+use Pi\Core\Application\Service\Encryption;
 use Pi\Core\Application\Service\File;
 
 class Loader
 {
-    public function service($name = null, $options = [])
+    public function service(string $name, array $options = [])
     {
         $serviceConfig = [
             'factories' => [
-                Demo::class  => InvokableFactory::class,
-                Audit::class => InvokableFactory::class,
-                File::class  => InvokableFactory::class,
+                Encryption::class => InvokableFactory::class,
+                File::class       => InvokableFactory::class,
             ],
             'aliases'   => [
-                'demo'  => Demo::class,
-                'audit' => Audit::class,
-                'file'  => File::class,
+                'encryption' => Encryption::class,
+                'file'       => File::class,
             ],
         ];
 
