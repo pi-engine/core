@@ -7,7 +7,10 @@ use Laminas\Router\Http\Literal;
 return [
     'service_manager' => [
         'aliases'   => [],
-        'factories' => [],
+        'factories' => [
+            Security\Account\AccountLoginAttempts::class => Factory\Security\AccountLoginAttemptsFactory::class,
+            Security\Account\AccountLocked::class        => Factory\Security\AccountLockedFactory::class,
+        ],
     ],
     'router'          => [
         'routes' => [
