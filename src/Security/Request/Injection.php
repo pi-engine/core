@@ -116,7 +116,8 @@ class Injection implements RequestSecurityInterface
             // Hex or binary injection with limits to avoid false positives
             '/\b0x[0-9a-fA-F]{2,255}\b/i', // Hexadecimal injection (limit length)
             '/\bx\'[0-9a-fA-F]{2,255}\'/i', // Hex-encoded strings (limit length)
-            '/\b(b|x)[\'"]?[0-9a-fA-F]{2,255}[\'"]?/i', // Binary/hex literals (same adjustment)
+            //'/\b(b|x)[\'"]?[0-9a-fA-F]{2,255}[\'"]?/i', // Binary/hex literals (same adjustment)
+            '/\b(b|x)[\'"]?(?!([a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}))[0-9a-fA-F]{2,255}[\'"]?/i', // Binary/hex literals (same adjustment)
 
             // Miscellaneous suspicious patterns, scoped more contextually
             '/\b(select.*from|union.*select|insert.*into|update.*set|delete\s+from|drop\s+table|create\s+table|alter\s+table|truncate\s+table)\b/i',
