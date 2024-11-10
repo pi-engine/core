@@ -52,7 +52,7 @@
 
   "autoload": {
     "psr-4": {
-      "User\\": "vendor/pi/core/src/"
+      "Pi\\Core\\": "vendor/pi/core/src/"
     }
   },
 

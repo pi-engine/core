@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Pi\Core;
 
 use Laminas\Router\Http\Literal;
 
@@ -10,6 +10,7 @@ return [
         'factories' => [
             Security\Account\AccountLoginAttempts::class => Factory\Security\AccountLoginAttemptsFactory::class,
             Security\Account\AccountLocked::class        => Factory\Security\AccountLockedFactory::class,
+            Middleware\SecurityMiddleware::class         => Factory\Middleware\SecurityMiddlewareFactory::class,
         ],
     ],
     'router'          => [

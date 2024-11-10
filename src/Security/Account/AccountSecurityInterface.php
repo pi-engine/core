@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Security\Account;
+namespace Pi\Core\Security\Account;
 
 interface AccountSecurityInterface
 {

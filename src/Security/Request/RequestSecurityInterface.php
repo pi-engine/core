@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Security\Request;
+namespace Pi\Core\Security\Request;
 
 use Psr\Http\Message\ServerRequestInterface;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Security\Response;
+namespace Pi\Core\Security\Response;
 
 use Laminas\Diactoros\Stream;
 use Laminas\Escaper\Escaper;

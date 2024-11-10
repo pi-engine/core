@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Security\Response;
+namespace Pi\Core\Security\Response;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

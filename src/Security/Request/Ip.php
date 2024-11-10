@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Security\Request;
+namespace Pi\Core\Security\Request;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ServerRequestInterface;

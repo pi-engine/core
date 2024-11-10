@@ -1,10 +1,10 @@
 <?php
 
-namespace Core\Factory\Security;
+namespace Pi\Core\Factory\Security;
 
-use Core\Security\Account\AccountLocked;
-use Core\Security\Account\AccountLoginAttempts;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Pi\Core\Security\Account\AccountLocked;
+use Pi\Core\Security\Account\AccountLoginAttempts;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
