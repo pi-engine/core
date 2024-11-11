@@ -4,7 +4,6 @@ namespace Pi\Core;
 
 return [
     'service_manager' => [
-        'aliases'   => [],
         'factories' => [
             Installer\Install::class                     => Factory\Installer\InstallFactory::class,
             Installer\Update::class                      => Factory\Installer\UpdateFactory::class,
