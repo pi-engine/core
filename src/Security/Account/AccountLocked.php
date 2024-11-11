@@ -3,7 +3,7 @@
 namespace Pi\Core\Security\Account;
 
 use Fig\Http\Message\StatusCodeInterface;
-use User\Service\CacheService;
+use Pi\Core\Service\CacheService;
 
 class AccountLocked implements AccountSecurityInterface
 {

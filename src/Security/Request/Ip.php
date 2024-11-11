@@ -3,8 +3,8 @@
 namespace Pi\Core\Security\Request;
 
 use Fig\Http\Message\StatusCodeInterface;
+use Pi\Core\Service\CacheService;
 use Psr\Http\Message\ServerRequestInterface;
-use User\Service\CacheService;
 
 class Ip implements RequestSecurityInterface
 {

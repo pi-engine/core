@@ -5,10 +5,10 @@ namespace Pi\Core\Factory\Security;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Security\Account\AccountLocked;
 use Pi\Core\Security\Account\AccountLoginAttempts;
+use Pi\Core\Service\CacheService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use User\Service\CacheService;
 
 class AccountLoginAttemptsFactory implements FactoryInterface
 {

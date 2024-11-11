@@ -2,6 +2,7 @@
 
 namespace Pi\Core\Middleware;
 
+use Pi\Core\Handler\ErrorHandler;
 use Pi\Core\Security\Request\Injection as RequestSecurityInjection;
 use Pi\Core\Security\Request\InputSizeLimit as RequestSecurityInputSizeLimit;
 use Pi\Core\Security\Request\InputValidation as RequestSecurityInputValidation;
@@ -12,15 +13,14 @@ use Pi\Core\Security\Request\Xss as RequestSecurityXss;
 use Pi\Core\Security\Response\Compress as ResponseCompress;
 use Pi\Core\Security\Response\Escape as ResponseEscape;
 use Pi\Core\Security\Response\Headers as ResponseHeaders;
+use Pi\Core\Service\CacheService;
+use Pi\Core\Service\UtilityService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use User\Handler\ErrorHandler;
-use User\Service\CacheService;
-use User\Service\UtilityService;
 
 class SecurityMiddleware implements MiddlewareInterface
 {

@@ -1,34 +1,30 @@
 <?php
 
-namespace Pi\Core\Factory\Security;
+namespace Pi\Core\Factory\Service;
 
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Pi\Core\Security\Account\AccountLocked;
-use Pi\Core\Service\CacheService;
+use Pi\Core\Service\UtilityService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class AccountLockedFactory implements FactoryInterface
+class UtilityServiceFactory implements FactoryInterface
 {
     /**
      * @param ContainerInterface $container
      * @param string             $requestedName
      * @param null|array         $options
      *
-     * @return AccountLocked
+     * @return UtilityService
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): AccountLocked
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): UtilityService
     {
         // Get config
         $config = $container->get('config');
-        $config = $config['security'] ?? [];
+        $config = $config['utility'] ?? [];
 
-        return new AccountLocked(
-            $container->get(CacheService::class),
-            $config
-        );
+        return new UtilityService($config);
     }
 }
