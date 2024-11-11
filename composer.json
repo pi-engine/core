@@ -34,7 +34,6 @@
     "ext-pdo": "*",
     "ext-spl": "*",
     "lib-curl": "*",
-
     "laminas/laminas-mvc": "*",
     "laminas/laminas-mvc-middleware": "*",
     "laminas/laminas-servicemanager": "*",
@@ -49,13 +48,11 @@
     "php-ffmpeg/php-ffmpeg": "*",
     "phpoffice/phpspreadsheet": "*"
   },
-
   "autoload": {
     "psr-4": {
       "Pi\\Core\\": "vendor/pi/core/src/"
     }
   },
-
   "suggest": {
     "ext-apc": "for opcode cache and system persistent data",
     "ext-discount": "for Markdown text parsing",
