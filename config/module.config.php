@@ -2,8 +2,6 @@
 
 namespace Pi\Core;
 
-use Laminas\Router\Http\Literal;
-
 return [
     'service_manager' => [
         'aliases'   => [],
@@ -22,19 +20,6 @@ return [
             Service\TranslatorService::class             => Factory\Service\TranslatorServiceFactory::class,
             Service\InstallerService::class              => Factory\Service\InstallerServiceFactory::class,
             Handler\ErrorHandler::class                     => Factory\Handler\ErrorHandlerFactory::class,
-        ],
-    ],
-    'router'          => [
-        'routes' => [
-            // Admin section
-            'admin_user' => [
-                'type'         => Literal::class,
-                'options'      => [
-                    'route'    => '/admin/core',
-                    'defaults' => [],
-                ],
-                'child_routes' => [],
-            ],
         ],
     ],
     'view_manager'    => [
