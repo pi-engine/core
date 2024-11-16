@@ -5,7 +5,7 @@ namespace Pi\Core\Service;
 use IntlDateFormatter;
 use Laminas\Escaper\Escaper;
 use NumberFormatter;
-use User\Service\ServiceInterface;
+use Pi\User\Service\ServiceInterface;
 use function class_exists;
 use function method_exists;
 use function preg_replace;

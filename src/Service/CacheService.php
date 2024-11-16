@@ -6,8 +6,8 @@ use DateTime;
 use Laminas\Cache\Psr\SimpleCache\SimpleCacheDecorator;
 use Laminas\Cache\Service\StorageAdapterFactoryInterface;
 use Laminas\Cache\Storage\Plugin\Serializer;
+use Pi\User\Service\ServiceInterface;
 use Redis;
-use User\Service\ServiceInterface;
 
 class CacheService implements ServiceInterface
 {

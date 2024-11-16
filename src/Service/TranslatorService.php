@@ -3,7 +3,7 @@
 namespace Pi\Core\Service;
 
 use Laminas\I18n\Translator\Translator;
-use User\Service\ServiceInterface;
+use Pi\User\Service\ServiceInterface;
 
 /**
  * Usage example in services

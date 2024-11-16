@@ -5,13 +5,13 @@ namespace Pi\Core\Factory\Middleware;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Handler\ErrorHandler;
 use Pi\Core\Middleware\InstallerMiddleware;
+use Pi\User\Service\PermissionService;
+use Pi\User\Service\RoleService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use User\Service\PermissionService;
-use User\Service\RoleService;
 
 class InstallerMiddlewareFactory implements FactoryInterface
 {

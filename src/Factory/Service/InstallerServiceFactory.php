@@ -4,8 +4,8 @@ namespace Pi\Core\Factory\Service;
 
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Service\InstallerService;
+use Pi\User\Service\PermissionService;
 use Psr\Container\ContainerInterface;
-use User\Service\PermissionService;
 
 class InstallerServiceFactory implements FactoryInterface
 {

@@ -4,14 +4,14 @@ namespace Pi\Core\Middleware;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Pi\Core\Handler\ErrorHandler;
+use Pi\User\Service\PermissionService;
+use Pi\User\Service\RoleService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use User\Service\PermissionService;
-use User\Service\RoleService;
 
 class InstallerMiddleware implements MiddlewareInterface
 {
