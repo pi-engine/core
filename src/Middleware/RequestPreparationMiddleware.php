@@ -54,11 +54,6 @@ class RequestPreparationMiddleware implements MiddlewareInterface
             $response = $handler->handle($request);
         }
 
-        // Check if the response can be compressed and compressed it
-        if (isset($this->config['compress']['is_active']) && $this->config['compress']['is_active']) {
-
-        }
-
         return $response;
     }
 
