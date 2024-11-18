@@ -132,7 +132,7 @@ class InputValidation implements RequestSecurityInterface
     private function processData(array $data): void
     {
         foreach ($data as $key => $value) {
-            if ($value !== null && $value !== '') {
+            if (empty($value) || $value === null || $value === '') {
                 continue;
             }
 
