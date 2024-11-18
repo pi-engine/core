@@ -117,7 +117,7 @@ class Injection implements RequestSecurityInterface
             '/\b0x[0-9a-fA-F]{2,255}\b/i', // Hexadecimal injection (limit length)
             '/\bx\'[0-9a-fA-F]{2,255}\'/i', // Hex-encoded strings (limit length)
             //'/\b(b|x)[\'"]?[0-9a-fA-F]{2,255}[\'"]?/i', // Binary/hex literals (same adjustment)
-            //'/\b(b|x)[\'"]?(?!([a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}))[0-9a-fA-F]{2,255}[\'"]?/i',
+            '/\b(b|x)[\'"]?(?!([a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}))[0-9a-fA-F]{2,255}[\'"]?/i',
             // Binary/hex literals (same adjustment)
 
             // Miscellaneous suspicious patterns, scoped more contextually
