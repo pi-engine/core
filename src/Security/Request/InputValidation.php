@@ -132,13 +132,13 @@ class InputValidation implements RequestSecurityInterface
     private function processData(array $data): void
     {
         foreach ($data as $key => $value) {
-            if (empty($value)) {
-                continue;
-            }
-
             // Initialize the input
             $input = new Input($key);
             $input->getFilterChain()->attach(new StringTrim())->attach(new StripTags())->attach(new HtmlEntities());
+
+            // Allow empty values for this input
+            $input->setAllowEmpty(true);
+            $input->setRequired(false);
 
             // Handle different types of data
             switch (gettype($value)) {
@@ -166,14 +166,13 @@ class InputValidation implements RequestSecurityInterface
                     break;
 
                 case 'array':
+                    // Recursively process arrays
                     $this->processData((array)$value);
                     continue 2; // Continue outer loop
 
                 default:
                     if ($value !== null && $value !== '') {
                         $input->getValidatorChain()->attach(new NotEmpty());
-                        $this->inputFilter->setData([$key => $value]);
-                        $this->inputFilter->getMessages()[$key][] = "Key '{$key}' has an unrecognized type and cannot be empty.";
                     }
                     break;
             }

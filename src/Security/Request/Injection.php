@@ -114,11 +114,8 @@ class Injection implements RequestSecurityInterface
             '/\bwaitfor\s+delay\b/i', // Time delay operations
 
             // Hex or binary injection with limits to avoid false positives
-            '/\b0x[0-9a-fA-F]{2,255}\b/i', // Hexadecimal injection (limit length)
-            '/\bx\'[0-9a-fA-F]{2,255}\'/i', // Hex-encoded strings (limit length)
-            //'/\b(b|x)[\'"]?[0-9a-fA-F]{2,255}[\'"]?/i', // Binary/hex literals (same adjustment)
-            '/\b(b|x)[\'"]?(?!([a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}))[0-9a-fA-F]{2,255}[\'"]?/i',
-            // Binary/hex literals (same adjustment)
+            '/\b0x[0-9a-fA-F]{2,32}\b/i', // Hexadecimal injection (limit length to reasonable size)
+            '/\bx\'[0-9a-fA-F]{2,32}\'/i', // Hex-encoded strings (limit length)
 
             // Miscellaneous suspicious patterns, scoped more contextually
             '/\b(select.*from|union.*select|insert.*into|update.*set|delete\s+from|drop\s+table|create\s+table|alter\s+table|truncate\s+table)\b/i',
@@ -129,8 +126,12 @@ class Injection implements RequestSecurityInterface
             '/\b(if|case)\s*\(/i', // If/Case conditions
             '/\s*;\s*(select|insert|update|delete|drop|create|alter|truncate)\s+/i', // Chained queries
 
-            // Handling encoded input
-            '/(?:%27|%22|%3D|%3B|%23|%2D|%2F|%5C)/i', // URL encoded equivalents of ', ", =, ;, #, -, /, and \ (common SQLi encodings)
+            // Handling encoded input, expanded to cover more encoding variants
+            '/(?:%27|%22|%3D|%3B|%23|%2D|%2F|%5C|%25|%2C|%5B|%5D|%7B|%7D)/i', // URL encoded equivalents of ', ", =, ;, #, -, /, \, %, [, ], {, }
+
+            // Additional defensive patterns to detect obfuscated payloads
+            '/\b(select|insert|update|delete)\b.*\bfrom\b/i', // Checking if SELECT/INSERT/UPDATE/DELETE are combined with FROM clause
+            '/\bselect\b\s*\*\s*\bfrom\b\s*\binformation_schema\b/i', // Specific check for SQL injection targeting information_schema
         ];
 
         // If input is an array, recursively check each item
@@ -143,12 +144,13 @@ class Injection implements RequestSecurityInterface
             return false; // No SQL injection detected in any array items
         }
 
-        // If input is a string, check for SQL injection patterns
-        if (is_string($input)) {
-            foreach ($injectionPatterns as $pattern) {
-                if (preg_match($pattern, $input)) {
-                    return true; // SQL injection detected
-                }
+        // Decode input
+        $input = urldecode($input);
+
+        // check for SQL injection patterns
+        foreach ($injectionPatterns as $pattern) {
+            if (preg_match($pattern, $input)) {
+                return true; // SQL injection detected
             }
         }
 
