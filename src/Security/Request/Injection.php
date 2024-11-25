@@ -148,9 +148,11 @@ class Injection implements RequestSecurityInterface
         $input = urldecode($input);
 
         // check for SQL injection patterns
-        foreach ($injectionPatterns as $pattern) {
-            if (preg_match($pattern, $input)) {
-                return true; // SQL injection detected
+        if (!empty($input)) {
+            foreach ($injectionPatterns as $pattern) {
+                if (preg_match($pattern, $input)) {
+                    return true; // SQL injection detected
+                }
             }
         }
 
