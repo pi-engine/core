@@ -66,7 +66,6 @@
     "laminas/laminas-inputfilter": "*",
     "laminas/laminas-permissions-rbac": "*",
     "laminas/laminas-i18n": "*",
-    "laminas/laminas-config": "*",
     "laminas/laminas-diactoros": "*",
     "laminas/laminas-soap": "*",
     "laminas/laminas-code": "*",
