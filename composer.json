@@ -24,8 +24,13 @@
       "homepage": "https://github.com/pi-engine/pi/graphs/contributors"
     }
   ],
+  "extra": {
+    "laminas": {
+      "module": "Pi\\Core"
+    }
+  },
   "require": {
-    "php": "^8.3",
+    "php": "~8.3.0 || ~8.4.0",
     "ext-redis": "*",
     "ext-ctype": "*",
     "ext-fileinfo": "*",
@@ -94,12 +99,18 @@
   },
   "autoload": {
     "psr-4": {
-      "Pi\\Core\\": "vendor/pi/core/src/"
+      "Pi\\Core\\": "src/"
     }
   },
   "suggest": {
     "ext-apc": "for opcode cache and system persistent data",
     "ext-discount": "for Markdown text parsing",
     "ext-intl": "for i18n features"
+  },
+  "config": {
+    "allow-plugins": {
+      "laminas/laminas-component-installer": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
