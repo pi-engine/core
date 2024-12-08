@@ -30,6 +30,7 @@ class ErrorHandler implements RequestHandlerInterface
     {
         $error  = $request->getAttribute('error');
         $status = $request->getAttribute('status');
+        $header = $request->getAttribute('header', []);
 
         // Set result
         return new JsonResponse(
@@ -39,7 +40,8 @@ class ErrorHandler implements RequestHandlerInterface
                 'error'  => $error,
                 'status' => $status,
             ],
-            $status
+            $status,
+            $header
         );
     }
 }
