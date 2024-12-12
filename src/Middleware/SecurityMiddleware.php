@@ -11,7 +11,6 @@ use Pi\Core\Security\Request\Method as RequestSecurityMethod;
 use Pi\Core\Security\Request\RequestLimit as RequestSecurityRequestLimit;
 use Pi\Core\Security\Request\Xss as RequestSecurityXss;
 use Pi\Core\Security\Response\Compress as ResponseCompress;
-use Pi\Core\Security\Response\Escape as ResponseEscape;
 use Pi\Core\Security\Response\Headers as ResponseHeaders;
 use Pi\Core\Service\CacheService;
 use Pi\Core\Service\UtilityService;
@@ -128,9 +127,9 @@ class SecurityMiddleware implements MiddlewareInterface
         if (isset($this->config['header']['is_active']) && $this->config['header']['is_active']) {
             $list['header'] = new ResponseHeaders($this->config);
         }
-        if (isset($this->config['escape']['is_active']) && $this->config['escape']['is_active']) {
-            $list['escape'] = new ResponseEscape($this->config);
-        }
+        //if (isset($this->config['escape']['is_active']) && $this->config['escape']['is_active']) {
+        //    $list['escape'] = new ResponseEscape($this->config);
+        //}
         if (isset($this->config['compress']['is_active']) && $this->config['compress']['is_active']) {
             $list['compress'] = new ResponseCompress($this->config);
         }
