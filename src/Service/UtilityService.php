@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pi\Core\Service;
 
 use IntlDateFormatter;
@@ -42,7 +44,7 @@ class UtilityService implements ServiceInterface
      * Valid values: 'NULL', 'FULL', 'LONG', 'MEDIUM', 'SHORT'
      *
      */
-    public function date(string $date = '', array $params = []): string
+    public function date(string|int $date = '', array $params = []): string
     {
         $date = empty($date) ? time() : $date;
 

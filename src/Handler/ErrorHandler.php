@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pi\Core\Handler;
 
 use Pi\Core\Response\EscapingJsonResponse;

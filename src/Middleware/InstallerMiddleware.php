@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pi\Core\Middleware;
 
 use Fig\Http\Message\StatusCodeInterface;

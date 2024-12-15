@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pi\Core\Security\Response;
 
 use Laminas\Diactoros\Stream;

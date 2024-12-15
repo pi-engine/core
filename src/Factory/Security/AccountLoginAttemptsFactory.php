@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pi\Core\Factory\Security;
 
 use Laminas\ServiceManager\Factory\FactoryInterface;

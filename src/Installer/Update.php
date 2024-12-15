@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pi\Core\Installer;
 
 use Pi\Core\Service\InstallerService;
