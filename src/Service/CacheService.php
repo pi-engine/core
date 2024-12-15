@@ -35,14 +35,16 @@ class CacheService implements ServiceInterface
             'first_name'          => null,
             'last_name'           => null,
             'avatar'              => null,
+            'time_created'        => 0,
             'last_login'          => 0,
             'status'              => 0,
-            'time_created'        => 0,
             'has_password'        => 0,
             'multi_factor_global' => 0,
             'multi_factor_status' => 0,
             'multi_factor_verify' => 0,
             'is_company_setup'    => 0,
+            'company_id'          => 0,
+            'company_title'       => null,
         ];
 
     /* @var SimpleCacheDecorator */
