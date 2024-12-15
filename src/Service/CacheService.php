@@ -110,7 +110,7 @@ class CacheService implements ServiceInterface
         }
 
         // Set params
-        if (isset($params['account']) && !empty($params['account'])) {
+        if (isset($params['account'])) {
             // Set user
             $user['account']       = $params['account'];
             $user['account']['id'] = (int)$user['account']['id'];
@@ -122,30 +122,37 @@ class CacheService implements ServiceInterface
                 }
             }
         }
-        if (isset($params['access_keys'])/* && !empty($params['access_keys'])*/) {
+
+        foreach ($this->userValuePattern as $accountKey => $accountValue) {
+            if (isset($params[$accountKey])) {
+                $user[$accountKey] = $params[$accountKey];
+            }
+        }
+
+        /* if (isset($params['access_keys'])) {
             $user['access_keys'] = $params['access_keys'];
         }
-        if (isset($params['refresh_keys'])/* && !empty($params['refresh_keys'])*/) {
+        if (isset($params['refresh_keys'])) {
             $user['refresh_keys'] = $params['refresh_keys'];
         }
-        if (isset($params['roles']) && !empty($params['roles'])) {
+        if (isset($params['roles'])) {
             $user['roles'] = $params['roles'];
         }
-        if (isset($params['otp']) && !empty($params['otp'])) {
+        if (isset($params['otp'])) {
             $user['otp'] = $params['otp'];
         }
-        if (isset($params['device_tokens']) && !empty($params['device_tokens'])) {
+        if (isset($params['device_tokens'])) {
             $user['device_tokens'] = $params['device_tokens'];
         }
-        if (isset($params['multi_factor']) && !empty($params['multi_factor'])) {
+        if (isset($params['multi_factor'])) {
             $user['multi_factor'] = $params['multi_factor'];
         }
-        if (isset($params['permission']) && !empty($params['permission'])) {
+        if (isset($params['permission'])) {
             $user['permission'] = $params['permission'];
         }
-        if (isset($params['authorization']) && !empty($params['authorization'])) {
+        if (isset($params['authorization'])) {
             $user['authorization'] = $params['authorization'];
-        }
+        } */
 
         // Set/Reset cache
         return $this->setItem($key, $user);
@@ -168,18 +175,18 @@ class CacheService implements ServiceInterface
         $this->deleteItem($key);
     }
 
-    public function setUserItem(int $userId, string $key, string $value): void
+    public function setUserItem(int $userId, string $key, string|array $value): void
     {
         $user = $this->getUser($userId);
         if (!empty($user) && !empty($value)) {
             switch ($key) {
                 case 'access_keys':
-                    $user['access_keys'] = array_unique(array_merge($user['access_keys'], [$value]));
+                    $user['access_keys'] = array_unique(array_merge($user['access_keys'], $value));
                     $this->setUser($userId, ['access_keys' => $user['access_keys']]);
                     break;
 
                 case 'refresh_keys':
-                    $user['refresh_keys'] = array_unique(array_merge($user['refresh_keys'], [$value]));
+                    $user['refresh_keys'] = array_unique(array_merge($user['refresh_keys'], $value));
                     $this->setUser($userId, ['refresh_keys' => $user['refresh_keys']]);
                     break;
 
@@ -189,7 +196,7 @@ class CacheService implements ServiceInterface
                     break;
 
                 case 'multi_factor':
-                    $user['multi_factor'] = array_unique(array_merge($user['multi_factor'], [$value]));
+                    $user['multi_factor'] = array_unique(array_merge($user['multi_factor'], $value));
                     $this->setUser($userId, ['multi_factor' => $user['multi_factor']]);
                     break;
 
@@ -208,7 +215,7 @@ class CacheService implements ServiceInterface
         if (!empty($user)) {
             switch ($key) {
                 case 'all_keys':
-                    $this->setUser($userId, ['access_keys' => [], 'refresh_keys' => []]);
+                    $this->setUser($userId, ['access_keys' => [], 'refresh_keys' => [], 'multi_factor' => []]);
                     break;
 
                 case 'access_keys':
