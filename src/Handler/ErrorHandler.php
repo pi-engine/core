@@ -2,7 +2,7 @@
 
 namespace Pi\Core\Handler;
 
-use Laminas\Diactoros\Response\JsonResponse;
+use Pi\Core\Response\EscapingJsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -33,7 +33,7 @@ class ErrorHandler implements RequestHandlerInterface
         $header = $request->getAttribute('header', []);
 
         // Set result
-        return new JsonResponse(
+        return new EscapingJsonResponse(
             [
                 'result' => false,
                 'data'   => new stdClass,
