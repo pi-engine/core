@@ -146,11 +146,9 @@ class Injection implements RequestSecurityInterface
             return false; // No SQL injection detected in any array items
         }
 
-        // Decode input
-        $input = urldecode($input);
-
         // check for SQL injection patterns
-        if (!empty($input)) {
+        if (!empty($input) && !is_numeric($input)) {
+            $input = urldecode($input);
             foreach ($injectionPatterns as $pattern) {
                 if (preg_match($pattern, $input)) {
                     return true; // SQL injection detected

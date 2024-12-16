@@ -127,7 +127,7 @@ class Xss implements RequestSecurityInterface
         }
 
         // If input is a string, check for XSS patterns
-        if (!empty($input)) {
+        if (!empty($input) && !is_numeric($input)) {
             foreach ($xssPatterns as $pattern) {
                 if (preg_match($pattern, $input)) {
                     return true; // XSS detected
