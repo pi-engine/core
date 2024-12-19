@@ -146,6 +146,9 @@ class Injection implements RequestSecurityInterface
             return false; // No SQL injection detected in any array items
         }
 
+        // Check null
+        $input = $input === 'null' ? null : $input;
+
         // check for SQL injection patterns
         if (!empty($input) && !is_numeric($input)) {
             $input = urldecode($input);

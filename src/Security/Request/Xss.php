@@ -126,6 +126,9 @@ class Xss implements RequestSecurityInterface
             return false; // No XSS detected in any array items
         }
 
+        // Check null
+        $input = $input === 'null' ? null : $input;
+
         // If input is a string, check for XSS patterns
         if (!empty($input) && !is_numeric($input)) {
             foreach ($xssPatterns as $pattern) {
