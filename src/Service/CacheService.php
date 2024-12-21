@@ -183,29 +183,23 @@ class CacheService implements ServiceInterface
         if (!empty($user) && !empty($value)) {
             switch ($key) {
                 case 'access_keys':
-                    $user['access_keys'] = array_unique(array_merge($user['access_keys'], $value));
-                    $this->setUser($userId, ['access_keys' => $user['access_keys']]);
+                    $this->setUser($userId, ['access_keys' => $value]);
                     break;
 
                 case 'refresh_keys':
-                    $user['refresh_keys'] = array_unique(array_merge($user['refresh_keys'], $value));
-                    $this->setUser($userId, ['refresh_keys' => $user['refresh_keys']]);
+                    $this->setUser($userId, ['refresh_keys' => $value]);
                     break;
 
                 case 'roles':
-                    $user['roles'] = array_unique(array_merge($user['roles'], [$value]));
-                    $this->setUser($userId, ['roles' => $user['roles']]);
+                    $this->setUser($userId, ['roles' => $value]);
                     break;
 
                 case 'multi_factor':
-                    $user['multi_factor'] = array_unique(array_merge($user['multi_factor'], $value));
-                    $this->setUser($userId, ['multi_factor' => $user['multi_factor']]);
+                    $this->setUser($userId, ['multi_factor' => $value]);
                     break;
 
-                // TODO: review this solution
                 case 'device_tokens':
-                    $user['device_tokens'] = $value;// array_unique(array_merge($user['device_tokens'], [$value]));
-                    $this->setUser($userId, ['device_tokens' => $user['device_tokens']]);
+                    $this->setUser($userId, ['device_tokens' => $value]);
                     break;
             }
         }
