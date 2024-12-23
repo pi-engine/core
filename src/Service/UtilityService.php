@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pi\Core\Service;
 
+use Exception;
 use IntlDateFormatter;
 use Laminas\Escaper\Escaper;
 use Laminas\Http\Client;
