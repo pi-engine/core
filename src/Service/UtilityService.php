@@ -359,4 +359,29 @@ class UtilityService implements ServiceInterface
 
         return preg_match($pattern, $password) === 1;
     }
+
+    /**
+     * Recursively builds a hierarchical tree from a flat array of domains based on parent-child relationships.
+     *
+     * @param array $elements
+     * @param int   $parentId
+     *
+     * @return array
+     */
+    public function buildTree(array &$elements, int $parentId = 0): array
+    {
+        $branch = [];
+        foreach ($elements as &$element) {
+            if ($element['parent_id'] == $parentId) {
+                $children = $this->buildTree($elements, $element['id']);
+                if ($children) {
+                    $element['children'] = $children;
+                }
+                $branch[] = $element;
+                unset($element);
+            }
+        }
+
+        return $branch;
+    }
 }
