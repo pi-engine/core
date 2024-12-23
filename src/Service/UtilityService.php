@@ -6,6 +6,8 @@ namespace Pi\Core\Service;
 
 use IntlDateFormatter;
 use Laminas\Escaper\Escaper;
+use Laminas\Http\Client;
+use Laminas\Http\Client\Adapter\Curl;
 use NumberFormatter;
 use Pi\User\Service\ServiceInterface;
 use function class_exists;
@@ -361,27 +363,87 @@ class UtilityService implements ServiceInterface
     }
 
     /**
-     * Recursively builds a hierarchical tree from a flat array of domains based on parent-child relationships.
+     * Recursively builds a hierarchical tree from a flat array of items based on parent-child relationships.
      *
-     * @param array $elements
-     * @param int   $parentId
+     * This function assembles a full tree starting from the specified parent item,
+     * recursively adding child items as subtrees.
      *
-     * @return array
+     * @param array $elements The flat array of items with parent-child relationships.
+     * @param int   $parentId The parent ID to start building the tree from.
+     *
+     * @return array The hierarchical tree, including all children and subtrees.
      */
+
     public function buildTree(array &$elements, int $parentId = 0): array
     {
-        $branch = [];
+        $result = [];
         foreach ($elements as &$element) {
             if ($element['parent_id'] == $parentId) {
                 $children = $this->buildTree($elements, $element['id']);
                 if ($children) {
                     $element['children'] = $children;
                 }
-                $branch[] = $element;
+                $result[] = $element;
                 unset($element);
             }
         }
 
-        return $branch;
+        return $result;
+    }
+
+    /**
+     * Retrieves all IDs starting from the given parentId and includes all descendant IDs
+     * as a flat list.
+     *
+     * @param array $elements The flat array of items with parent-child relationships.
+     * @param int   $parentId The parent ID to start from.
+     * @param array $processedIds Keeps track of processed IDs to avoid duplicates.
+     *
+     * @return array A flat list of IDs.
+     */
+    public function buildSubTree(array $elements, int $parentId, array &$processedIds = []): array
+    {
+        $result = [];
+
+        foreach ($elements as $element) {
+            if (!in_array($element['id'], $processedIds) && ($element['id'] === $parentId || $element['parent_id'] === $parentId)) {
+                $processedIds[] = $element['id']; // Mark ID as processed
+                $result[] = $element['id']; // Add current ID
+                $result = array_merge($result, $this->buildSubTree($elements, $element['id'], $processedIds)); // Add children IDs
+            }
+        }
+
+        return $result;
+    }
+
+
+
+    public function callService($url, $method, $header, $body = []): array
+    {
+        // Set curl config
+        $config = [
+            'adapter'     => Curl::class,
+            'curloptions' => [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT        => 0,
+                CURLOPT_CONNECTTIMEOUT => 0,
+            ],
+        ];
+
+        $client = new Client($url, $config);
+        $client->setMethod($method);
+        $client->setHeaders($header);
+        if (!empty($body)) {
+            $client->setRawBody(json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        }
+        $response     = $client->send();
+        $responseBody = $response->getBody();
+        $responseBody = json_decode($responseBody, true);
+        if (!is_null($responseBody) || !empty($responseBody)) {
+            return $responseBody;
+        }
+
+        return [];
     }
 }
