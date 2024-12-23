@@ -8,6 +8,9 @@ use IntlDateFormatter;
 use Laminas\Escaper\Escaper;
 use Laminas\Http\Client;
 use Laminas\Http\Client\Adapter\Curl;
+use Laminas\Http\Client\Adapter\Exception\InvalidArgumentException;
+use Laminas\Http\Client\Adapter\Exception\RuntimeException;
+use Laminas\Http\Client\Adapter\Exception\TimeoutException;
 use NumberFormatter;
 use Pi\User\Service\ServiceInterface;
 use function class_exists;
@@ -418,32 +421,136 @@ class UtilityService implements ServiceInterface
 
 
 
-    public function callService($url, $method, $header, $body = []): array
+    /**
+     * Makes an HTTP request using Laminas HTTP Client and returns the response.
+     *
+     * @param string     $url     The endpoint URL.
+     * @param string     $method  The HTTP method (GET, POST, PUT, DELETE, etc.).
+     * @param array      $headers The HTTP headers to include in the request.
+     * @param array|null $body    The request body (optional).
+     *
+     * @return array Returns an associative array with the keys:
+     *               - 'result' (bool): Indicates if the call was successful.
+     *               - 'data' (array): The decoded response data if successful, or an empty array on failure.
+     *               - 'error' (array|null): Contains 'message' (string) and optional 'response' (string) if there was an error.
+     */
+    public function callService(string $url, string $method, array $headers = [], ?array $body = null): array
     {
-        // Set curl config
+        // Check HTTP method
+        $validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'];
+        if (!in_array(strtoupper($method), $validMethods, true)) {
+            return [
+                'result' => false,
+                'data'   => [],
+                'error'  => ['message' => "Invalid HTTP method: {$method}"],
+            ];
+        }
+
+        // Check url
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return [
+                'result' => false,
+                'data'   => [],
+                'error'  => ['message' => "Invalid URL: {$url}"],
+            ];
+        }
+
+        // Set up the HTTP client configuration
         $config = [
             'adapter'     => Curl::class,
             'curloptions' => [
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_TIMEOUT        => 0,
-                CURLOPT_CONNECTTIMEOUT => 0,
+                CURLOPT_TIMEOUT        => 180,
+                CURLOPT_CONNECTTIMEOUT => 10,
             ],
         ];
 
+        // Set HTTP client
         $client = new Client($url, $config);
         $client->setMethod($method);
-        $client->setHeaders($header);
+        $client->setHeaders($headers);
         if (!empty($body)) {
             $client->setRawBody(json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         }
-        $response     = $client->send();
-        $responseBody = $response->getBody();
-        $responseBody = json_decode($responseBody, true);
-        if (!is_null($responseBody) || !empty($responseBody)) {
-            return $responseBody;
-        }
 
-        return [];
+        try {
+            $response   = $client->send();
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode >= 200 && $statusCode < 300) {
+                $responseBody = $response->getBody();
+                $decodedBody  = json_decode($responseBody, true);
+
+                // Check if the response contains valid JSON and is an array
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decodedBody)) {
+                    // Check if the response contains 'result' or 'data'
+                    if (isset($decodedBody['result']) || isset($decodedBody['data'])) {
+                        return $decodedBody;
+                    } else {
+                        // Return the decoded body as 'data' with 'result' => true and no error
+                        return [
+                            'result' => true,
+                            'data'   => $decodedBody,
+                            'error'  => null,
+                        ];
+                    }
+                }
+
+                return [
+                    'result' => false,
+                    'data'   => [],
+                    'error'  => [
+                        'message'  => 'Invalid or empty JSON response',
+                        'response' => $responseBody,
+                    ],
+                ];
+            }
+
+            return [
+                'result' => false,
+                'data'   => [],
+                'error'  => [
+                    'message'  => "HTTP error with status code {$statusCode}",
+                    'response' => $response->getBody(),
+                ],
+            ];
+        } catch (TimeoutException $e) {
+            return [
+                'result' => false,
+                'data'   => [],
+                'error'  => [
+                    'message'  => 'Request timed out',
+                    'response' => $e->getMessage(),
+                ],
+            ];
+        } catch (RuntimeException $e) {
+            return [
+                'result' => false,
+                'data'   => [],
+                'error'  => [
+                    'message'  => 'Runtime error occurred',
+                    'response' => $e->getMessage(),
+                ],
+            ];
+        } catch (InvalidArgumentException $e) {
+            return [
+                'result' => false,
+                'data'   => [],
+                'error'  => [
+                    'message'  => 'Invalid argument passed to the HTTP client',
+                    'response' => $e->getMessage(),
+                ],
+            ];
+        } catch (Exception $e) {
+            return [
+                'result' => false,
+                'data'   => [],
+                'error'  => [
+                    'message'  => 'An error occurred: ' . $e->getMessage(),
+                    'response' => $e->getMessage(),
+                ],
+            ];
+        }
     }
 }
