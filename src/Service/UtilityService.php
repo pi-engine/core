@@ -420,7 +420,73 @@ class UtilityService implements ServiceInterface
         return $result;
     }
 
+    /**
+     * Filters an input array, removing keys that are not in the specified field list.
+     *
+     * @param array $params The input array to be filtered. Keys represent field names, and values are their corresponding data.
+     * @param array $fieldList The list of allowed field names. Only keys from this list will be retained in the filtered array.
+     *
+     * @return array The filtered array containing only keys that are present in the field list.
+     *
+     * Example:
+     * ```php
+     * $params = [
+     *     'first_name' => 'John',
+     *     'last_name' => 'Doe',
+     *     'age' => 30,
+     *     'email' => 'john.doe@example.com'
+     * ];
+     * $fieldList = ['first_name', 'last_name'];
+     *
+     * $filteredParams = $this->filterParams($params, $fieldList);
+     * // Result: [
+     * //     'first_name' => 'John',
+     * //     'last_name' => 'Doe'
+     * // ]
+     * ```
+     */
+    public function filterParams(array $params, array $fieldList): array
+    {
+        return array_filter(
+            $params,
+            fn($key) => in_array($key, $fieldList, true),
+            ARRAY_FILTER_USE_KEY
+        );
+    }
 
+    /**
+     * Ensures the input array contains all fields from the allowed list.
+     * Any missing fields will be added with a null value.
+     *
+     * @param array $params The input array to be validated.
+     * @param array $fieldList The list of fields to ensure in the input array.
+     *
+     * @return array The modified array containing all fields from the list.
+     *
+     * Example:
+     * ```php
+     * $params = ['first_name' => 'John'];
+     * $fieldList = ['first_name', 'last_name', 'email'];
+     *
+     * $result = $this->ensureFields($params, $fieldList);
+     * // Result: [
+     * //     'first_name' => 'John',
+     * //     'last_name' => null,
+     * //     'email' => null
+     * // ]
+     * ```
+     */
+    // ToDo: use this function in project
+    public function ensureFields(array $params, array $fieldList): array
+    {
+        foreach ($fieldList as $field) {
+            if (!array_key_exists($field, $params)) {
+                $params[$field] = null;
+            }
+        }
+
+        return $params;
+    }
 
     /**
      * Makes an HTTP request using Laminas HTTP Client and returns the response.
