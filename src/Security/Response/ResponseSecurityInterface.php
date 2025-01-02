@@ -10,7 +10,8 @@ use Psr\Http\Message\ServerRequestInterface;
 interface ResponseSecurityInterface
 {
     /**
-     * @param ResponseInterface $response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
      *
      * @return ResponseInterface
      */
