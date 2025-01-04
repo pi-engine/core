@@ -21,7 +21,7 @@ class EscaperAction implements ActionSecurityInterface
 
     public function process(array $data): array
     {
-        $escaper = new Escaper('utf-8');
+        // Set entity map
         $entityMap = [
             '&#039;' => "'",
             '&quot;' => '"',
@@ -30,6 +30,8 @@ class EscaperAction implements ActionSecurityInterface
             //'&gt;'   => '>',
         ];
 
+        // Set escaper
+        $escaper = new Escaper('utf-8');
         array_walk_recursive($data, function (&$item) use ($escaper, $entityMap) {
             if (is_string($item)) {
                 $escaped = $escaper->escapeHtml($item);
