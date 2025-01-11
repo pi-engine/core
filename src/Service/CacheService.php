@@ -284,7 +284,7 @@ class CacheService implements ServiceInterface
     {
         // Setup redis
         $redis = new Redis();
-        $redis->connect($this->config['options']['server']['host'], $this->config['options']['server']['port']);
+        $redis->connect($this->config['options']['server']['host'], (int)$this->config['options']['server']['port']);
 
         // Get keys
         $keys = $redis->keys(sprintf('%s:*', $this->config['options']['namespace']));
@@ -341,7 +341,7 @@ class CacheService implements ServiceInterface
 
         // Setup redis
         $redis = new Redis();
-        $redis->connect($this->config['options']['server']['host'], $this->config['options']['server']['port']);
+        $redis->connect($this->config['options']['server']['host'], (int)$this->config['options']['server']['port']);
         $redis->persist($key);
     }
 }
