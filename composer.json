@@ -51,7 +51,6 @@
     "laminas/laminas-skeleton-installer":  "*",
     "laminas/laminas-mvc":  "*",
     "laminas/laminas-db":  "*",
-    "laminas/laminas-log":  "*",
     "laminas/laminas-cli":  "*",
     "laminas/laminas-mvc-i18n":  "*",
     "laminas/laminas-mvc-plugins": "*",
@@ -71,9 +70,9 @@
     "laminas/laminas-server": "*",
     "laminas/laminas-diagnostics": "*",
     "laminas/laminas-uri": "*",
-    "laminas/laminas-escaper": "*",
     "lm-commons/lmc-cors": "*",
     "firebase/php-jwt": "*",
+    "symfony/mailer": "*",
     "phpmailer/phpmailer": "*",
     "imagine/imagine": "*",
     "phpoffice/phppresentation": "*",
@@ -90,7 +89,9 @@
     "triagens/arangodb": "*",
     "doctrine/mongodb-odm-bundle": "*",
     "doctrine/doctrine-mongo-odm-module": "*",
-    "aws/aws-sdk-php": "*"
+    "aws/aws-sdk-php": "*",
+    "monolog/monolog": "*",
+    "twilio/sdk": "*"
   },
   "autoload": {
     "psr-4": {
