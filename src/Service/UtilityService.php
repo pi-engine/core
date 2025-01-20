@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pi\Core\Service;
 
+use DateTime;
+use DateTimeZone;
 use Exception;
 use IntlDateFormatter;
 use Laminas\Escaper\Escaper;
@@ -37,6 +39,19 @@ class UtilityService implements ServiceInterface
     public function __construct($config)
     {
         $this->config = $config;
+    }
+
+    /**
+     * @throws \DateInvalidTimeZoneException
+     * @throws \DateMalformedStringException
+     */
+    public function getTime($params = []): string
+    {
+        $timezone = $params['timezone'] ?? $this->config['timezone'] ?? 'UTC';
+        $format   = $params['format'] ?? $this->config['date_format'] ?? 'Y-m-d H:i:s';
+
+        $date = new DateTime('now', new DateTimeZone($timezone));
+        return $date->format($format);
     }
 
     /**
@@ -399,8 +414,8 @@ class UtilityService implements ServiceInterface
      * Retrieves all IDs starting from the given parentId and includes all descendant IDs
      * as a flat list.
      *
-     * @param array $elements The flat array of items with parent-child relationships.
-     * @param int   $parentId The parent ID to start from.
+     * @param array $elements     The flat array of items with parent-child relationships.
+     * @param int   $parentId     The parent ID to start from.
      * @param array $processedIds Keeps track of processed IDs to avoid duplicates.
      *
      * @return array A flat list of IDs.
@@ -412,8 +427,8 @@ class UtilityService implements ServiceInterface
         foreach ($elements as $element) {
             if (!in_array($element['id'], $processedIds) && ($element['id'] === $parentId || $element['parent_id'] === $parentId)) {
                 $processedIds[] = $element['id']; // Mark ID as processed
-                $result[] = $element['id']; // Add current ID
-                $result = array_merge($result, $this->buildSubTree($elements, $element['id'], $processedIds)); // Add children IDs
+                $result[]       = $element['id']; // Add current ID
+                $result         = array_merge($result, $this->buildSubTree($elements, $element['id'], $processedIds)); // Add children IDs
             }
         }
 
@@ -423,7 +438,7 @@ class UtilityService implements ServiceInterface
     /**
      * Filters an input array, removing keys that are not in the specified field list.
      *
-     * @param array $params The input array to be filtered. Keys represent field names, and values are their corresponding data.
+     * @param array $params    The input array to be filtered. Keys represent field names, and values are their corresponding data.
      * @param array $fieldList The list of allowed field names. Only keys from this list will be retained in the filtered array.
      *
      * @return array The filtered array containing only keys that are present in the field list.
@@ -458,7 +473,7 @@ class UtilityService implements ServiceInterface
      * Ensures the input array contains all fields from the allowed list.
      * Any missing fields will be added with a null value.
      *
-     * @param array $params The input array to be validated.
+     * @param array $params    The input array to be validated.
      * @param array $fieldList The list of fields to ensure in the input array.
      *
      * @return array The modified array containing all fields from the list.

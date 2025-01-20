@@ -6,6 +6,8 @@ namespace Pi\Core\Factory\Handler;
 
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Handler\ErrorHandler;
+use Pi\Core\Service\UtilityService;
+use Pi\Logger\Service\LoggerService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -27,7 +29,9 @@ class ErrorHandlerFactory implements FactoryInterface
     {
         return new ErrorHandler(
             $container->get(ResponseFactoryInterface::class),
-            $container->get(StreamFactoryInterface::class)
+            $container->get(StreamFactoryInterface::class),
+            $container->get(UtilityService::class),
+            $container->get(LoggerService::class)
         );
     }
 }
