@@ -31,12 +31,12 @@ class ErrorHandler implements RequestHandlerInterface
     public function __construct(
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface   $streamFactory,
-        UtilityService         $utilityService,
-        LoggerService $loggerService
+        UtilityService           $utilityService,
+        LoggerService            $loggerService
     ) {
         $this->responseFactory = $responseFactory;
         $this->streamFactory   = $streamFactory;
-        $this->utilityService = $utilityService;
+        $this->utilityService  = $utilityService;
         $this->loggerService   = $loggerService;
     }
 
@@ -82,17 +82,23 @@ class ErrorHandler implements RequestHandlerInterface
             $routeParams['handler']
         );
 
+        // Set message
+        $message = 'An unspecified error occurred';
+        if (isset($error['message']) && !empty($error['message']) && isset($routeParams['title']) && !empty($routeParams['title'])) {
+            $message = sprintf('%s - %s', $error['message'], $routeParams['title']);
+        }
+
         // Set log params
         $params = [
-            'path'       => $path,
-            'message'    => $error['message'],
-            'user_id'    => $attributes['account']['id'] ?? 0,
-            'company_id' => $attributes['company_authorization']['company_id'] ?? 0,
-            'ip'         => $request->getServerParams()['REMOTE_ADDR'],
-            'route'      => $routeParams,
+            'path'        => $path,
+            'message'     => $message,
+            'user_id'     => $attributes['account']['id'] ?? 0,
+            'company_id'  => $attributes['company_authorization']['company_id'] ?? 0,
+            'ip'          => $request->getServerParams()['REMOTE_ADDR'],
+            'route'       => $routeParams,
             'timestamp'   => $this->utilityService->getTime(),
             'time_create' => time(),
-            'request'    => [
+            'request'     => [
                 'method'          => $request->getMethod(),
                 'uri'             => (string)$request->getUri(),
                 'headers'         => $request->getHeaders(),
@@ -106,18 +112,18 @@ class ErrorHandler implements RequestHandlerInterface
                 'attributes'      => $request->getAttributes(),
                 'target'          => $request->getRequestTarget(),
             ],
-            'response'   => [
-                'body'            => $response->getBody(),
+            'response'    => [
+                //'body'            => $response->getBody(),
                 'headers'         => $response->getHeaders(),
                 'protocolVersion' => $response->getProtocolVersion(),
                 'encodingOptions' => $response->getEncodingOptions(),
-                'payload'         => $response->getPayload(),
+                //'payload'         => $response->getPayload(),
                 'reasonPhrase'    => $response->getReasonPhrase(),
                 'statusCode'      => $response->getStatusCode(),
             ],
         ];
 
         // Set log
-        $this->loggerService->write($path, $params,$error['message'], 400);
+        $this->loggerService->write($params, 400);
     }
 }
