@@ -124,6 +124,6 @@ class ErrorHandler implements RequestHandlerInterface
         ];
 
         // Set log
-        $this->loggerService->write($params, 400);
+        $this->loggerService->write($params, LogLevel::DEBUG);
     }
 }
