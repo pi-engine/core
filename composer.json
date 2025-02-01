@@ -6,15 +6,14 @@
     "Pi",
     "Pi Engine",
     "Laminas",
+    "Laminas MVC",
+    "Laminas Module",
+    "Psr",
     "MultiTenant",
     "SaaS"
   ],
-  "homepage": "http://piengine.org",
+  "homepage": "https://piengine.org",
   "authors": [
-    {
-      "name": "Taiwen Jiang",
-      "email": "taiwen@me.com"
-    },
     {
       "name": "Hossein Azizabadi Farahani",
       "email": "hossein@azizabadi.com"
