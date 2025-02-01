@@ -87,7 +87,6 @@
     "phpseclib/phpseclib": "*",
     "mongodb/mongodb": "*",
     "triagens/arangodb": "*",
-    "doctrine/mongodb-odm-bundle": "*",
     "doctrine/doctrine-mongo-odm-module": "*",
     "aws/aws-sdk-php": "*",
     "monolog/monolog": "*",
