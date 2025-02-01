@@ -6,12 +6,16 @@ namespace Pi\Core\Security\Request;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\UtilityService;
 use Psr\Http\Message\ServerRequestInterface;
 
 class RequestLimit implements RequestSecurityInterface
 {
     /* @var CacheService */
     protected CacheService $cacheService;
+
+    /** @var UtilityService */
+    protected UtilityService $utilityService;
 
     /* @var array */
     protected array $config;
@@ -21,9 +25,11 @@ class RequestLimit implements RequestSecurityInterface
 
     public function __construct(
         CacheService $cacheService,
+        UtilityService $utilityService,
                      $config
     ) {
         $this->cacheService = $cacheService;
+        $this->utilityService = $utilityService;
         $this->config       = $config;
     }
 
@@ -49,11 +55,8 @@ class RequestLimit implements RequestSecurityInterface
             ];
         }
 
-        // Get client ip
-        $clientIp = $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown';
-
         // Set key
-        $key = $this->sanitizeKey("rate_limit_{$clientIp}");
+        $key = $this->sanitizeKey("rate_limit_{$this->utilityService->getClientIp()}");
 
         // Get and check key
         $cacheData = $this->cacheService->getItem($key);

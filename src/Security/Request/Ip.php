@@ -6,12 +6,16 @@ namespace Pi\Core\Security\Request;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\UtilityService;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Ip implements RequestSecurityInterface
 {
     /* @var CacheService */
     protected CacheService $cacheService;
+
+    /** @var UtilityService */
+    protected UtilityService $utilityService;
 
     /* @var array */
     protected array $config;
@@ -20,11 +24,13 @@ class Ip implements RequestSecurityInterface
     protected string $name = 'ip';
 
     public function __construct(
-        CacheService $cacheService,
-                     $config
+        CacheService   $cacheService,
+        UtilityService $utilityService,
+                       $config
     ) {
-        $this->cacheService = $cacheService;
-        $this->config       = $config;
+        $this->cacheService   = $cacheService;
+        $this->utilityService = $utilityService;
+        $this->config         = $config;
     }
 
     /**
@@ -36,7 +42,7 @@ class Ip implements RequestSecurityInterface
     public function check(ServerRequestInterface $request, array $securityStream = []): array
     {
         // Get client ip
-        $clientIp = $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown';
+        $clientIp = $this->utilityService->getClientIp();
 
         // Check ip is not lock
         if ($this->isIpLocked($clientIp)) {

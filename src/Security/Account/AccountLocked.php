@@ -6,11 +6,15 @@ namespace Pi\Core\Security\Account;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\UtilityService;
 
 class AccountLocked implements AccountSecurityInterface
 {
     /* @var CacheService */
     protected CacheService $cacheService;
+
+    /** @var UtilityService */
+    protected UtilityService $utilityService;
 
     /* @var array */
     protected array $config;
@@ -20,9 +24,11 @@ class AccountLocked implements AccountSecurityInterface
 
     public function __construct(
         CacheService $cacheService,
+        UtilityService           $utilityService,
                      $config
     ) {
         $this->cacheService = $cacheService;
+        $this->utilityService  = $utilityService;
         $this->config       = $config;
     }
 
@@ -75,7 +81,7 @@ class AccountLocked implements AccountSecurityInterface
                 break;
 
             case 'ip':
-                $userIp    = $params['user_ip'] ?? $_SERVER['REMOTE_ADDR'];
+                $userIp    = $params['user_ip'] ?? $this->utilityService->getClientIp();
                 $keyLocked = $this->sanitizeKey("locked_ip_{$userIp}");
                 break;
         }

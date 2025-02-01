@@ -368,6 +368,45 @@ class UtilityService implements ServiceInterface
     }
 
     /**
+     * Get the real client IP address from the request.
+     *
+     * This function checks the headers such as X-Forwarded-For and X-Real-IP
+     * and falls back to REMOTE_ADDR if those headers are not available.
+     * It also validates and filters out private or invalid IP addresses.
+     *
+     * @return string The client's IP address
+     */
+    function getClientIp(): string
+    {
+        // Check the X-Forwarded-For header for proxy-aware IP addresses
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // The X-Forwarded-For header may contain multiple comma-separated IPs
+            $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            foreach ($ipList as $ip) {
+                // Trim whitespace and check if the IP is valid and not private
+                $cleanIp = trim($ip);
+                if (filter_var($cleanIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $cleanIp;
+                }
+            }
+        }
+
+        // Check the X-Real-IP header (commonly used by proxies like Nginx)
+        if (!empty($_SERVER['HTTP_X_REAL_IP']) && filter_var($_SERVER['HTTP_X_REAL_IP'], FILTER_VALIDATE_IP)) {
+            return $_SERVER['HTTP_X_REAL_IP'];
+        }
+
+        // Default to REMOTE_ADDR if no valid proxy headers are found
+        if (!empty($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP)) {
+            return $_SERVER['REMOTE_ADDR'];
+        }
+
+        // Fallback if no valid IP is found
+        return '0.0.0.0';
+    }
+
+
+    /**
      * Check password is strong
      *
      * @param $password

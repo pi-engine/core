@@ -99,7 +99,7 @@ class SecurityMiddleware implements MiddlewareInterface
     {
         $list = [];
         if (isset($this->config['ip']['is_active']) && $this->config['ip']['is_active']) {
-            $list['ip'] = new RequestSecurityIp($this->cacheService, $this->config);
+            $list['ip'] = new RequestSecurityIp($this->cacheService, $this->utilityService, $this->config);
         }
         if (isset($this->config['method']['is_active']) && $this->config['method']['is_active']) {
             $list['method'] = new RequestSecurityMethod($this->config);
@@ -108,7 +108,7 @@ class SecurityMiddleware implements MiddlewareInterface
             $list['inputSizeLimit'] = new RequestSecurityInputSizeLimit($this->config);
         }
         if (isset($this->config['requestLimit']['is_active']) && $this->config['requestLimit']['is_active']) {
-            $list['requestLimit'] = new RequestSecurityRequestLimit($this->cacheService, $this->config);
+            $list['requestLimit'] = new RequestSecurityRequestLimit($this->cacheService, $this->utilityService, $this->config);
         }
         if (isset($this->config['xss']['is_active']) && $this->config['xss']['is_active']) {
             $list['xss'] = new RequestSecurityXss($this->config);

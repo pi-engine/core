@@ -95,7 +95,7 @@ class ErrorHandler implements RequestHandlerInterface
             'message'     => $message,
             'user_id'     => $attributes['account']['id'] ?? 0,
             'company_id'  => $attributes['company_authorization']['company_id'] ?? 0,
-            'ip'          => $request->getServerParams()['REMOTE_ADDR'],
+            'ip'          => $this->utilityService->getClientIp(),
             'route'       => $routeParams,
             'timestamp'   => $this->utilityService->getTime(),
             'time_create' => time(),

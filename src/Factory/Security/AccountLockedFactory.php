@@ -7,6 +7,7 @@ namespace Pi\Core\Factory\Security;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Security\Account\AccountLocked;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\UtilityService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -30,6 +31,7 @@ class AccountLockedFactory implements FactoryInterface
 
         return new AccountLocked(
             $container->get(CacheService::class),
+            $container->get(UtilityService::class),
             $config
         );
     }
