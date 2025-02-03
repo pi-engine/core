@@ -15,7 +15,6 @@ use Laminas\Http\Client\Adapter\Exception\InvalidArgumentException;
 use Laminas\Http\Client\Adapter\Exception\RuntimeException;
 use Laminas\Http\Client\Adapter\Exception\TimeoutException;
 use NumberFormatter;
-use Pi\User\Service\ServiceInterface;
 use function class_exists;
 use function method_exists;
 use function preg_replace;

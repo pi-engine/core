@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Pi\Core\Service;
 
 use Laminas\I18n\Translator\Translator;
-use Pi\User\Service\ServiceInterface;
 
 /**
  * Usage example in services

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Pi\Core\Service;
 
 use Pi\User\Service\PermissionService;
-use Pi\User\Service\ServiceInterface;
 
 class InstallerService implements ServiceInterface
 {
