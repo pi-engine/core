@@ -25,7 +25,8 @@ class Signature
 
         // If either key is missing, regenerate both
         if (!file_exists($this->config['private_key']) || !file_exists($this->config['public_key'])) {
-            throw new RuntimeException('Signature private key and public key files not exist.');
+            //throw new RuntimeException('Signature private key and public key files not exist.');
+            $this->createKeys();
         }
     }
 
