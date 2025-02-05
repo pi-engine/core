@@ -7,6 +7,7 @@ namespace Pi\Core\Security;
 use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Crypt\RSA;
 use RuntimeException;
+use Throwable;
 
 class Signature
 {
@@ -19,7 +20,7 @@ class Signature
 
         // Validate config keys
         if (empty($this->config['private_key']) || empty($this->config['public_key'])) {
-            throw new RuntimeException('Private key and public key paths must be provided in config.');
+            throw new RuntimeException('Signature private key and public key paths must be provided in config.');
         }
 
         // If either key is missing, regenerate both
@@ -47,7 +48,7 @@ class Signature
         $privateKey = PublicKeyLoader::load(file_get_contents($this->config['private_key']));
 
         if (!$privateKey instanceof RSA\PrivateKey) {
-            throw new RuntimeException('Invalid private key type.');
+            throw new RuntimeException('Invalid private key type for check signature.');
         }
 
         return base64_encode($privateKey->sign($dataString));
@@ -73,25 +74,40 @@ class Signature
         $publicKey = PublicKeyLoader::load(file_get_contents($this->config['public_key']));
 
         if (!$publicKey instanceof RSA\PublicKey) {
-            throw new RuntimeException('Invalid public key type.');
+            throw new RuntimeException('Invalid private key type for check signature.');
         }
 
         return $publicKey->verify($dataString, base64_decode($signature));
     }
 
     /**
-     * Create and save signature private_key and public_key automatically
+     * Generates and saves a 4096-bit RSA key pair.
      *
-     * @return void True if signature is valid, false otherwise
+     * This method automatically creates a private and public key in PKCS8 format
+     * and saves them to the configured file paths.
+     *
+     * @throws RuntimeException If key generation or file saving fails.
+     * @return void
      */
     public function createKeys(): void
     {
-        // Generate a 4096-bit RSA private key
-        $privateKey = RSA::createKey(4096);
-        $publicKey  = $privateKey->getPublicKey();
+        try {
+            // Generate a 4096-bit RSA private key
+            $privateKey = RSA::createKey(4096);
+            $publicKey  = $privateKey->getPublicKey();
 
-        // Save PEM-formatted keys
-        file_put_contents($this->config['private_key'], $privateKey->toString('PKCS8'));
-        file_put_contents($this->config['public_key'], $publicKey->toString('PKCS8'));
+            // Save PEM-formatted keys
+            if (!file_put_contents($this->config['private_key'], $privateKey->toString('PKCS8'))) {
+                throw new RuntimeException("Failed to save signature private key to {$this->config['private_key']}");
+            }
+
+            if (!file_put_contents($this->config['public_key'], $publicKey->toString('PKCS8'))) {
+                throw new RuntimeException("Failed to save signature public key to {$this->config['public_key']}");
+            }
+        } catch (Throwable $e) {
+            // Log the error
+            error_log("[ERROR] RSA Key Generation: " . $e->getMessage());
+            throw new RuntimeException("Error generating signature RSA keys. Please check logs.");
+        }
     }
 }
