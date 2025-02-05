@@ -1,0 +1,119 @@
+<?php
+
+$local    = 'en_US';
+$basePath = '/app';
+$baseUrl  = 'http://localhost:8080';
+
+return [
+    'db'      => [
+        'driver'         => 'Pdo',
+        'dsn'            => 'mysql:dbname=XXX;host=XXX;charset=utf8',
+        'username'       => 'XXX',
+        'password'       => 'XXX',
+        'driver_options' => [
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
+            PDO::ATTR_PERSISTENT         => false,
+        ],
+        'options'        => [],
+    ],
+    'global'  => [
+        'sitename' => 'Lamines',
+        'baseurl'  => $baseUrl,
+        'platform' => 'dev-123'
+    ],
+    'cache'   => [
+        'storage' => 'redis',
+        'options' => [
+            'namespace' => 'local_laminas',
+            'ttl'       => 1209600,
+            'server'    => [
+                '127.0.0.1',
+                6379,
+            ],
+        ],
+        'plugins' => [
+            [
+                'name' => 'serializer',
+            ],
+        ],
+    ],
+    'utility' => [
+        'local'         => $local,
+        'currency'      => 'USD',
+        'timezone'      => 'Asia/Dubai',
+        'date_local'    => $local,
+        'date_type'     => IntlDateFormatter::SHORT,
+        'time_type'     => IntlDateFormatter::NONE,
+        'date_calendar' => IntlDateFormatter::TRADITIONAL,
+        'date_pattern'  => 'dd/MM/yyyy',
+    ],
+    'security'     => [
+        // Request
+        'ip'             => [
+            'is_active' => true,
+            'whitelist' => [
+                '172.18.0.1',
+                '192.168.1.1',
+                '10.0.0.0/24', // Range
+            ],
+            'blacklist' => [
+                'unknown',
+                '203.0.113.5',
+                '198.51.100.0/24', // Range
+            ],
+        ],
+        'method'         => [
+            'is_active'    => true,
+            'allow_method' => ['POST', 'GET'],
+        ],
+        'xss'            => [
+            'is_active'        => true,
+            'ignore_whitelist' => true,
+        ],
+        'injection'            => [
+            'is_active'        => true,
+            'ignore_whitelist' => true,
+        ],
+        'inputValidation'=> [
+            'is_active'        => true,
+            'ignore_whitelist' => true,
+        ],
+        'inputSizeLimit' => [
+            'is_active'      => true,
+            'max_input_size' => 1048576, // 1MB in bytes
+        ],
+        'requestLimit'   => [
+            'is_active'        => true,
+            'ignore_whitelist' => true,
+            'max_requests'     => 100,
+            'rate_limit'       => 60, // Time window in seconds
+        ],
+        // Response
+        'header'          => [
+            'is_active' => true,
+        ],
+        'escape'          => [
+            'is_active' => true,
+        ],
+        'compress'        => [
+            'is_active' => true,
+        ],
+        // Account
+        'account'        => [
+            'attempts' => 5,
+            'ttl'      => 3600,
+        ],
+    ],
+    'translator' => [
+        'locale'                    => $local,
+        'translation_file_patterns' => [
+            //...
+            [
+                'type'     => 'phparray',
+                'base_dir' => $basePath . '/module/User/language',
+                'pattern'  => '%s.php',
+            ],
+            //...
+        ],
+    ],
+];

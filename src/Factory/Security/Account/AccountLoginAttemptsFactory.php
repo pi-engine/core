@@ -2,36 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Pi\Core\Factory\Security;
+namespace Pi\Core\Factory\Security\Account;
 
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Security\Account\AccountLocked;
+use Pi\Core\Security\Account\AccountLoginAttempts;
 use Pi\Core\Service\CacheService;
-use Pi\Core\Service\UtilityService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class AccountLockedFactory implements FactoryInterface
+class AccountLoginAttemptsFactory implements FactoryInterface
 {
     /**
      * @param ContainerInterface $container
      * @param string             $requestedName
      * @param null|array         $options
      *
-     * @return AccountLocked
+     * @return AccountLoginAttempts
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): AccountLocked
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): AccountLoginAttempts
     {
         // Get config
         $config = $container->get('config');
         $config = $config['security'] ?? [];
 
-        return new AccountLocked(
+        return new AccountLoginAttempts(
             $container->get(CacheService::class),
-            $container->get(UtilityService::class),
+            $container->get(AccountLocked::class),
             $config
         );
     }

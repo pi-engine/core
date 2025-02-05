@@ -12,12 +12,17 @@ use Pi\User\Middleware\AuthorizationMiddleware;
 
 return [
     'service_manager' => [
+        'aliases'   => [
+            Repository\SignatureRepositoryInterface::class => Repository\SignatureRepository::class,
+        ],
         'factories' => [
+            Repository\SignatureRepository::class          => Factory\Repository\SignatureRepositoryFactory::class,
+            Security\Account\AccountLoginAttempts::class   => Factory\Security\Account\AccountLoginAttemptsFactory::class,
+            Security\Account\AccountLocked::class          => Factory\Security\Account\AccountLockedFactory::class,
+            Security\Signature::class                      => Factory\Security\SignatureFactory::class,
             Installer\Install::class                       => Factory\Installer\InstallFactory::class,
             Installer\Update::class                        => Factory\Installer\UpdateFactory::class,
             Installer\Remove::class                        => Factory\Installer\RemoveFactory::class,
-            Security\Account\AccountLoginAttempts::class   => Factory\Security\AccountLoginAttemptsFactory::class,
-            Security\Account\AccountLocked::class          => Factory\Security\AccountLockedFactory::class,
             Middleware\SecurityMiddleware::class           => Factory\Middleware\SecurityMiddlewareFactory::class,
             Middleware\InstallerMiddleware::class          => Factory\Middleware\InstallerMiddlewareFactory::class,
             Middleware\ErrorMiddleware::class              => Factory\Middleware\ErrorMiddlewareFactory::class,
