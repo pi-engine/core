@@ -23,70 +23,95 @@ class SignatureRepository implements SignatureRepositoryInterface
      */
     private Signature $signature;
 
+    /* @var array */
+    protected array $config;
+
     public function __construct(
         AdapterInterface $db,
-        Signature        $signature
+        Signature        $signature,
+                         $config
     ) {
         $this->db        = $db;
         $this->signature = $signature;
+        $this->config    = $config;
     }
 
-    public function updateSignature(string $table, int $id, array $fields): void
+    public function updateSignature(string $table, int $id): void
     {
-        $sql    = new Sql($this->db);
-        $select = $sql->select($table)->where(['id' => $id]);
+        // Set fields
+        $fields = $this->config['signature_fields'][$table] ?? [];
 
-        $statement = $sql->prepareStatementForSqlObject($select);
-        $result    = $statement->execute()->current();
+        // Check table is active for signature process
+        if (in_array($table, $this->config['allowed_tables']) && !empty($fields)) {
+            $sql    = new Sql($this->db);
+            $select = $sql->select($table)->where(['id' => $id]);
 
-        if (!$result) {
-            throw new RuntimeException("Record with ID {$id} not found in table {$table}.");
-        }
+            $statement = $sql->prepareStatementForSqlObject($select);
+            $result    = $statement->execute()->current();
 
-        // Extract specified fields
-        $data = array_intersect_key($result, array_flip($fields));
+            if (!$result) {
+                throw new RuntimeException("Record with ID {$id} not found in table {$table}.");
+            }
 
-        // Generate new signature
-        $signature = $this->signature->signData($data);
+            // Extract specified fields
+            $data = array_intersect_key($result, array_flip($fields));
 
-        // Update signature field
-        $update = new Update($table);
-        $update->set(['signature' => $signature])->where(['id' => $id]);
-
-        $updateStatement = $sql->prepareStatementForSqlObject($update);
-        $updateResult    = $updateStatement->execute();
-
-        if (!$updateResult instanceof ResultInterface) {
-            throw new RuntimeException("Database error while updating signature for ID: {$id}");
-        }
-    }
-
-    public function updateAllSignatures(string $table, array $fields): void
-    {
-        $sql    = new Sql($this->db);
-        $select = $sql->select($table);
-
-        $statement = $sql->prepareStatementForSqlObject($select);
-        $result    = $statement->execute();
-
-        foreach ($result as $row) {
-            $data      = array_intersect_key($row, array_flip($fields));
+            // Generate new signature
             $signature = $this->signature->signData($data);
 
+            // Update signature field
             $update = new Update($table);
-            $update->set(['signature' => $signature])->where(['id' => (int)$row['id']]);
+            $update->set(['signature' => $signature])->where(['id' => $id]);
 
             $updateStatement = $sql->prepareStatementForSqlObject($update);
             $updateResult    = $updateStatement->execute();
 
             if (!$updateResult instanceof ResultInterface) {
-                throw new RuntimeException("Database error while updating signature for ID: {$row['id']}");
+                throw new RuntimeException("Database error while updating signature for ID: {$id}");
             }
         }
     }
 
-    public function checkSignature(string $table, int $id, array $fields): bool
+    public function updateAllSignatures(string $table): void
     {
+        // Set fields
+        $fields = $this->config['signature_fields'][$table] ?? [];
+
+        // Check table is active for signature process
+        if (in_array($table, $this->config['allowed_tables']) && !empty($fields)) {
+            $sql    = new Sql($this->db);
+            $select = $sql->select($table);
+
+            $statement = $sql->prepareStatementForSqlObject($select);
+            $result    = $statement->execute();
+
+            foreach ($result as $row) {
+                $data      = array_intersect_key($row, array_flip($fields));
+                $signature = $this->signature->signData($data);
+
+                $update = new Update($table);
+                $update->set(['signature' => $signature])->where(['id' => (int)$row['id']]);
+
+                $updateStatement = $sql->prepareStatementForSqlObject($update);
+                $updateResult    = $updateStatement->execute();
+
+                if (!$updateResult instanceof ResultInterface) {
+                    throw new RuntimeException("Database error while updating signature for ID: {$row['id']}");
+                }
+            }
+        }
+    }
+
+    public function checkSignature(string $table, int $id): bool
+    {
+        // Set fields
+        $fields = $this->config['signature_fields'][$table] ?? [];
+
+        // Check table is active for signature process
+        if (!in_array($table, $this->config['allowed_tables']) || empty($fields)) {
+            return false;
+        }
+
         $sql    = new Sql($this->db);
         $select = $sql->select($table)->columns(array_merge($fields, ['signature']))->where(['id' => $id]);
 
@@ -101,8 +126,16 @@ class SignatureRepository implements SignatureRepositoryInterface
         return $this->signature->verifySignature($data, $result['signature']);
     }
 
-    public function checkAllSignatures(string $table, array $fields): array
+    public function checkAllSignatures(string $table): array
     {
+        // Set fields
+        $fields = $this->config['signature_fields'][$table] ?? [];
+
+        // Check table is active for signature process
+        if (!in_array($table, $this->config['allowed_tables']) || empty($fields)) {
+            return [];
+        }
+
         $sql    = new Sql($this->db);
         $select = $sql->select($table)->columns(array_merge(['id'], $fields, ['signature']));
 

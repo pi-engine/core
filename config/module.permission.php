@@ -24,5 +24,27 @@ return [
                 'admin',
             ],
         ],
+        [
+            'title'      => 'Admin signature check',
+            'module'     => 'core',
+            'section'    => 'admin',
+            'package'    => 'signature',
+            'handler'    => 'check',
+            'permission' => 'admin-core-signature-check',
+            'role'       => [
+                'admin',
+            ],
+        ],
+        [
+            'title'      => 'Admin signature update',
+            'module'     => 'core',
+            'section'    => 'admin',
+            'package'    => 'signature',
+            'handler'    => 'update',
+            'permission' => 'admin-core-signature-update',
+            'role'       => [
+                'admin',
+            ],
+        ],
     ],
 ];

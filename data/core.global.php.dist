@@ -48,6 +48,11 @@ return [
         'date_pattern'  => 'dd/MM/yyyy',
     ],
     'security'     => [
+        // General
+        'signature' => [
+            'public_key'  => $basePath . '/data/keys/signature_public_key.pem',
+            'private_key' => $basePath . '/data/keys/signature_private_key.pem',
+        ],
         // Request
         'ip'             => [
             'is_active' => true,

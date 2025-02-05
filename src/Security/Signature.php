@@ -25,7 +25,7 @@ class Signature
 
         // If either key is missing, regenerate both
         if (!file_exists($this->config['private_key']) || !file_exists($this->config['public_key'])) {
-            $this->createKeys();
+            throw new RuntimeException('Signature private key and public key files not exist.');
         }
     }
 
@@ -57,13 +57,18 @@ class Signature
     /**
      * Verify a digital signature against data
      *
-     * @param array  $data      The original data array
-     * @param string $signature The signature stored in the database
+     * @param array       $data      The original data array
+     * @param string|null $signature The signature stored in the database
      *
      * @return bool True if signature is valid, false otherwise
      */
-    public function verifySignature(array $data, string $signature): bool
+    public function verifySignature(array $data, string|null $signature): bool
     {
+        // Check row is not null
+        if (is_null($signature)) {
+            return false;
+        }
+
         // Sort data keys to ensure consistent hashing order
         ksort($data);
 
@@ -86,8 +91,8 @@ class Signature
      * This method automatically creates a private and public key in PKCS8 format
      * and saves them to the configured file paths.
      *
-     * @throws RuntimeException If key generation or file saving fails.
      * @return void
+     * @throws RuntimeException If key generation or file saving fails.
      */
     public function createKeys(): void
     {

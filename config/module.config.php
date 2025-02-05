@@ -27,15 +27,18 @@ return [
             Middleware\InstallerMiddleware::class          => Factory\Middleware\InstallerMiddlewareFactory::class,
             Middleware\ErrorMiddleware::class              => Factory\Middleware\ErrorMiddlewareFactory::class,
             Middleware\RequestPreparationMiddleware::class => Factory\Middleware\RequestPreparationMiddlewareFactory::class,
+            Service\InstallerService::class                => Factory\Service\InstallerServiceFactory::class,
             Service\ConfigService::class                   => Factory\Service\ConfigServiceFactory::class,
             Service\CacheService::class                    => Factory\Service\CacheServiceFactory::class,
             Service\UtilityService::class                  => Factory\Service\UtilityServiceFactory::class,
             Service\TranslatorService::class               => Factory\Service\TranslatorServiceFactory::class,
-            Service\InstallerService::class                => Factory\Service\InstallerServiceFactory::class,
+            Service\SignatureService::class                => Factory\Service\SignatureServiceFactory::class,
             Handler\ErrorHandler::class                    => Factory\Handler\ErrorHandlerFactory::class,
             Handler\InstallerHandler::class                => Factory\Handler\InstallerHandlerFactory::class,
             Handler\Admin\Config\ListHandler::class        => Factory\Handler\Admin\Config\ListHandlerFactory::class,
             Handler\Admin\Config\UpdateHandler::class      => Factory\Handler\Admin\Config\UpdateHandlerFactory::class,
+            Handler\Admin\Signature\CheckHandler::class    => Factory\Handler\Admin\Signature\CheckHandlerFactory::class,
+            Handler\Admin\Signature\UpdateHandler::class   => Factory\Handler\Admin\Signature\UpdateHandlerFactory::class,
         ],
     ],
     'router'          => [
@@ -101,6 +104,60 @@ return [
                             ],
                         ],
                     ],
+                    'signature' => [
+                        'type'         => Literal::class,
+                        'options'      => [
+                            'route'    => '/signature',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'check'  => [
+                                'type'    => Literal::class,
+                                'options' => [
+                                    'route'    => '/check',
+                                    'defaults' => [
+                                        'title'      => 'Admin signature check',
+                                        'module'     => 'core',
+                                        'section'    => 'admin',
+                                        'package'    => 'signature',
+                                        'handler'    => 'check',
+                                        'permission' => 'admin-core-signature-check',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Signature\CheckHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                            'update' => [
+                                'type'    => Literal::class,
+                                'options' => [
+                                    'route'    => '/update',
+                                    'defaults' => [
+                                        'title'      => 'Admin signature update',
+                                        'module'     => 'core',
+                                        'section'    => 'admin',
+                                        'package'    => 'signature',
+                                        'handler'    => 'update',
+                                        'permission' => 'admin-core-signature-update',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Signature\UpdateHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+
                     // Admin installer
                     'installer' => [
                         'type'    => Literal::class,

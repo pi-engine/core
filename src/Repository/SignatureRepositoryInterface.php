@@ -6,11 +6,11 @@ namespace Pi\Core\Repository;
 
 interface SignatureRepositoryInterface
 {
-    public function updateSignature(string $table, int $id, array $fields): void;
+    public function updateSignature(string $table, int $id): void;
 
-    public function updateAllSignatures(string $table, array $fields): void;
+    public function updateAllSignatures(string $table): void;
 
-    public function checkSignature(string $table, int $id, array $fields): bool;
+    public function checkSignature(string $table, int $id): bool;
 
-    public function checkAllSignatures(string $table, array $fields): array;
+    public function checkAllSignatures(string $table): array;
 }
