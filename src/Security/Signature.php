@@ -79,6 +79,11 @@ class Signature
         return $publicKey->verify($dataString, base64_decode($signature));
     }
 
+    /**
+     * Create and save signature private_key and public_key automatically
+     *
+     * @return void True if signature is valid, false otherwise
+     */
     public function createKeys(): void
     {
         // Generate a 4096-bit RSA private key
