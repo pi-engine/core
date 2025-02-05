@@ -49,9 +49,15 @@ return [
     ],
     'security'     => [
         // General
-        'signature' => [
-            'public_key'  => $basePath . '/data/keys/signature_public_key.pem',
-            'private_key' => $basePath . '/data/keys/signature_private_key.pem',
+        'signature'       => [
+            'public_key'       => $basePath . '/data/keys/signature_public_key.pem',
+            'private_key'      => $basePath . '/data/keys/signature_private_key.pem',
+            'allowed_tables'   => ['user_account', 'role_account', 'permission_role'],
+            'signature_fields' => [
+                'user_account'    => ['id', 'name', 'identity', 'email', 'mobile', 'credential', 'status', 'multi_factor_status', 'multi_factor_secret'],
+                'role_account'    => ['id', 'user_id', 'role', 'section'],
+                'permission_role' => ['id', 'key', 'resource', 'section', 'module', 'role'],
+            ],
         ],
         // Request
         'ip'             => [
