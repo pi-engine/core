@@ -36,7 +36,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         $this->config    = $config;
     }
 
-    public function updateSignature(string $table, int $id): void
+    public function updateSignature(string $table, array $params): void
     {
         // Set fields
         $fields = $this->config['signature_fields'][$table] ?? [];
@@ -44,13 +44,13 @@ class SignatureRepository implements SignatureRepositoryInterface
         // Check table is active for signature process
         if (in_array($table, $this->config['allowed_tables']) && !empty($fields)) {
             $sql    = new Sql($this->db);
-            $select = $sql->select($table)->where(['id' => $id]);
+            $select = $sql->select($table)->where($params);
 
             $statement = $sql->prepareStatementForSqlObject($select);
             $result    = $statement->execute()->current();
 
             if (!$result) {
-                throw new RuntimeException("Record with ID {$id} not found in table {$table}.");
+                throw new RuntimeException("Record with selected ID not found in table {$table}.");
             }
 
             // Extract specified fields
@@ -61,13 +61,13 @@ class SignatureRepository implements SignatureRepositoryInterface
 
             // Update signature field
             $update = new Update($table);
-            $update->set(['signature' => $signature])->where(['id' => $id]);
+            $update->set(['signature' => $signature])->where($params);
 
             $updateStatement = $sql->prepareStatementForSqlObject($update);
             $updateResult    = $updateStatement->execute();
 
             if (!$updateResult instanceof ResultInterface) {
-                throw new RuntimeException("Database error while updating signature for ID: {$id}");
+                throw new RuntimeException("Database error while updating signature for selected ID");
             }
         }
     }
@@ -102,7 +102,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         }
     }
 
-    public function checkSignature(string $table, int $id): bool
+    public function checkSignature(string $table, array $params): bool
     {
         // Set fields
         $fields = $this->config['signature_fields'][$table] ?? [];
@@ -113,7 +113,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         }
 
         $sql    = new Sql($this->db);
-        $select = $sql->select($table)->columns(array_merge($fields, ['signature']))->where(['id' => $id]);
+        $select = $sql->select($table)->columns(array_merge($fields, ['signature']))->where($params);
 
         $statement = $sql->prepareStatementForSqlObject($select);
         $result    = $statement->execute()->current();
