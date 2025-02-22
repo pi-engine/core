@@ -56,13 +56,12 @@ class UtilityService implements ServiceInterface
     /**
      * Load date formatter
      *
-     * @param string $date
-     * @param array  $params
+     * @param string|int $date
+     * @param array      $params
      *
      * @return string
      * @see IntlDateFormatter
      * Valid values: 'NULL', 'FULL', 'LONG', 'MEDIUM', 'SHORT'
-     *
      */
     public function date(string|int $date = '', array $params = []): string
     {
