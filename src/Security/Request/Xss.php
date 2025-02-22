@@ -120,21 +120,27 @@ class Xss implements RequestSecurityInterface
         if (is_array($input)) {
             foreach ($input as $value) {
                 if ($this->detectXSS($value)) {
-                    return true; // XSS detected in one of the array items
+                    return true;
                 }
             }
-            return false; // No XSS detected in any array items
+
+            return false;
         }
 
-        // Check null
-        $input = $input === 'null' ? null : $input;
+        // Allow int, float, and bool without further checks
+        if (is_int($input) || is_float($input) || is_bool($input)) {
+            return false;
+        }
 
-        // If input is a string, check for XSS patterns
-        if (!empty($input) && !is_numeric($input)) {
-            foreach ($xssPatterns as $pattern) {
-                if (preg_match($pattern, $input)) {
-                    return true; // XSS detected
-                }
+        // Ensure only strings are checked, error on other types
+        if (!is_string($input)) {
+            return true;
+        }
+
+        // Check for XSS patterns in strings
+        foreach ($xssPatterns as $pattern) {
+            if (preg_match($pattern, $input)) {
+                return true;
             }
         }
 

@@ -140,22 +140,28 @@ class Injection implements RequestSecurityInterface
         if (is_array($input)) {
             foreach ($input as $value) {
                 if ($this->detectInjection($value)) {
-                    return true; // SQL injection detected in one of the array items
+                    return true;
                 }
             }
-            return false; // No SQL injection detected in any array items
+
+            return false;
         }
 
-        // Check null
-        $input = $input === 'null' ? null : $input;
+        // Allow int, float, and bool without further checks
+        if (is_null($input) || is_int($input) || is_float($input) || is_bool($input)) {
+            return false;
+        }
 
-        // check for SQL injection patterns
-        if (!empty($input) && !is_numeric($input)) {
-            $input = urldecode($input);
-            foreach ($injectionPatterns as $pattern) {
-                if (preg_match($pattern, $input)) {
-                    return true; // SQL injection detected
-                }
+        // Ensure only strings are checked, error on other types
+        if (!is_string($input)) {
+            return true;
+        }
+
+        // Check for SQL injection patterns in strings
+        $input = urldecode($input);
+        foreach ($injectionPatterns as $pattern) {
+            if (preg_match($pattern, $input)) {
+                return true;
             }
         }
 
