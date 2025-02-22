@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Pi\Core\Service;
 
-use Pi\Core\Repository\SignatureRepository;
+use Pi\Core\Repository\SignatureRepositoryInterface;
 use Pi\Core\Security\Signature;
 
 class SignatureService implements ServiceInterface
 {
     /**
-     * @var SignatureRepository
+     * @var SignatureRepositoryInterface
      */
-    protected SignatureRepository $signatureRepository;
+    protected SignatureRepositoryInterface $signatureRepositoryInterface;
 
     /**
      * @var Signature
@@ -23,11 +23,11 @@ class SignatureService implements ServiceInterface
     protected array $config;
 
     public function __construct(
-        SignatureRepository $signatureRepository,
+        SignatureRepositoryInterface $signatureRepositoryInterface,
         Signature           $signature,
                             $config
     ) {
-        $this->signatureRepository = $signatureRepository;
+        $this->signatureRepositoryInterface = $signatureRepositoryInterface;
         $this->signature           = $signature;
         $this->config              = $config;
     }
@@ -41,7 +41,7 @@ class SignatureService implements ServiceInterface
             && isset($params['table'])
             && in_array($params['table'], $this->config['allowed_tables'])
         ) {
-            $result = $this->signatureRepository->checkAllSignatures($params['table']);
+            $result = $this->signatureRepositoryInterface->checkAllSignatures($params['table']);
         }
 
         return $result;
@@ -55,7 +55,16 @@ class SignatureService implements ServiceInterface
             && isset($params['table'])
             && in_array($params['table'], $this->config['allowed_tables'])
         ) {
-            $this->signatureRepository->updateAllSignatures($params['table']);
+            // Set update params
+            $updateParams = [];
+            if (isset($params['just_empty']) && !empty($params['just_empty'])) {
+                $updateParams['just_empty'] = $params['just_empty'];
+            }
+            if (isset($params['limit']) && !empty($params['limit']) && is_numeric($params['limit'])) {
+                $updateParams['limit'] = $params['limit'];
+            }
+
+            $this->signatureRepositoryInterface->updateAllSignatures($params['table'], $updateParams);
         }
     }
 

@@ -6,6 +6,9 @@ namespace Pi\Core\Repository;
 
 use Laminas\Db\Adapter\AdapterInterface;
 use Laminas\Db\Adapter\Driver\ResultInterface;
+use Laminas\Db\Sql\Predicate\Expression;
+use Laminas\Db\Sql\Predicate\IsNull;
+use Laminas\Db\Sql\Predicate\PredicateSet;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\Update;
 use Pi\Core\Security\Signature;
@@ -72,15 +75,29 @@ class SignatureRepository implements SignatureRepositoryInterface
         }
     }
 
-    public function updateAllSignatures(string $table): void
+    public function updateAllSignatures(string $table, array $params = []): void
     {
         // Set fields
         $fields = $this->config['signature_fields'][$table] ?? [];
 
+        // Set where
+        $where = [];
+        if (!empty($params['just_empty'])) {
+            $where[] = new PredicateSet([
+                new IsNull('signature'),
+                new Expression("signature = ''"),
+            ], PredicateSet::COMBINED_BY_OR);
+        }
+
         // Check table is active for signature process
         if (in_array($table, $this->config['allowed_tables']) && !empty($fields)) {
             $sql    = new Sql($this->db);
-            $select = $sql->select($table);
+            $select = $sql->select($table)->where($where);
+
+            // Set limit if set
+            if (!empty($params['just_empty']) && !empty($params['limit'])) {
+                $select->limit($params['limit']);
+            }
 
             $statement = $sql->prepareStatementForSqlObject($select);
             $result    = $statement->execute();
@@ -142,10 +159,24 @@ class SignatureRepository implements SignatureRepositoryInterface
         $statement = $sql->prepareStatementForSqlObject($select);
         $results   = $statement->execute();
 
-        $result = [];
+        $result = [
+            'total'      => 0,
+            'verified'   => 0,
+            'unverified' => 0,
+            'list'       => [],
+        ];
         foreach ($results as $row) {
-            $data               = array_intersect_key($row, array_flip($fields));
-            $result[$row['id']] = $this->signature->verifySignature($data, $row['signature']);
+            $data   = array_intersect_key($row, array_flip($fields));
+            $verify = $this->signature->verifySignature($data, $row['signature']);
+
+            // Set result
+            $result['total'] = $result['total'] + 1;
+            if ($verify) {
+                $result['verified'] = $result['verified'] + 1;
+            } else {
+                $result['unverified']       = $result['unverified'] + 1;
+                $result['list'][] = $row['id'];
+            }
         }
 
         return $result;
