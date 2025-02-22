@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pi\Core\Service;
 
+use DateInvalidTimeZoneException;
+use DateMalformedStringException;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -41,8 +43,8 @@ class UtilityService implements ServiceInterface
     }
 
     /**
-     * @throws \DateInvalidTimeZoneException
-     * @throws \DateMalformedStringException
+     * @throws DateInvalidTimeZoneException
+     * @throws DateMalformedStringException
      */
     public function getTime($params = []): string
     {
@@ -86,7 +88,7 @@ class UtilityService implements ServiceInterface
     /**
      * Escape a string for corresponding context
      *
-     * @param string|array $value
+     * @param string|array $data
      * @param string       $context
      *      String context, valid value: html, htmlAttr, js, url, css
      *
