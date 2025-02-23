@@ -148,7 +148,7 @@ class Injection implements RequestSecurityInterface
         }
 
         // Allow int, float, and bool without further checks
-        if (is_null($input) || is_int($input) || is_float($input) || is_bool($input)) {
+        if (is_int($input) || is_float($input) || is_bool($input) || empty($input)) {
             return false;
         }
 
