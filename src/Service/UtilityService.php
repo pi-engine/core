@@ -391,7 +391,7 @@ class UtilityService implements ServiceInterface
             'HTTP_TRUE_CLIENT_IP',        // Akamai & some CDN providers
             'HTTP_CF_PSEUDO_IPV4',        // Cloudflare's pseudo IPv4 header for IPv6 clients
             'HTTP_X_CLUSTER_CLIENT_IP',   // Load balancers (e.g., AWS, Google Cloud, Kubernetes)
-            'HTTP_X_ORIGINAL_FORWARDED_FOR' // Edge cases (Google Cloud, Azure)
+            'HTTP_X_ORIGINAL_FORWARDED_FOR', // Edge cases (Google Cloud, Azure)
         ];
 
         // Extract potential IPs from headers
@@ -432,8 +432,9 @@ class UtilityService implements ServiceInterface
     /**
      * Check if an IP is in the allowed list (supports CIDR ranges)
      *
-     * @param string $ip The IP to check.
-     * @param array $allowedIps List of allowed IPs and CIDR subnets.
+     * @param string $ip         The IP to check.
+     * @param array  $allowedIps List of allowed IPs and CIDR subnets.
+     *
      * @return bool True if allowed, otherwise false.
      */
     public function isIpAllowed(string $ip, array $allowedIps): bool
@@ -455,16 +456,17 @@ class UtilityService implements ServiceInterface
     /**
      * Check if an IP falls within a CIDR subnet.
      *
-     * @param string $ip The IP to check.
+     * @param string $ip   The IP to check.
      * @param string $cidr The CIDR subnet (e.g., "192.168.1.0/24").
+     *
      * @return bool True if IP is within the subnet, otherwise false.
      */
     private function isIpInRange(string $ip, string $cidr): bool
     {
         [$subnet, $mask] = explode('/', $cidr);
-        $ipBinary = ip2long($ip);
+        $ipBinary     = ip2long($ip);
         $subnetBinary = ip2long($subnet);
-        $maskBinary = -1 << (32 - $mask);
+        $maskBinary   = -1 << (32 - $mask);
 
         return ($ipBinary & $maskBinary) === ($subnetBinary & $maskBinary);
     }
@@ -574,6 +576,7 @@ class UtilityService implements ServiceInterface
     /**
      * Ensures the input array contains all fields from the allowed list.
      * Any missing fields will be added with a null value.
+     * If the field list is empty, all input fields are accepted without modification.
      *
      * @param array $params    The input array to be validated.
      * @param array $fieldList The list of fields to ensure in the input array.
@@ -596,6 +599,11 @@ class UtilityService implements ServiceInterface
     // ToDo: use this function in project
     public function ensureFields(array $params, array $fieldList): array
     {
+        // If no specific field list is provided, return the input as-is
+        if (empty($fieldList)) {
+            return $params;
+        }
+
         foreach ($fieldList as $field) {
             if (!array_key_exists($field, $params)) {
                 $params[$field] = null;
@@ -604,6 +612,53 @@ class UtilityService implements ServiceInterface
 
         return $params;
     }
+
+    /**
+     * Updates an existing array with new values while ensuring all required fields are present.
+     * If the field list is empty, all input fields are accepted.
+     *
+     * @param array $params    The input data containing updated values.
+     * @param array $existing  The existing record to be updated.
+     * @param array $fieldList The list of allowed fields.
+     *
+     * @return array The updated record with all required fields.
+     *
+     * Example:
+     * ```php
+     * $existing = ['first_name' => 'John', 'last_name' => 'Doe', 'email' => 'john@example.com'];
+     * $params = ['first_name' => 'Jane'];
+     * $fieldList = ['first_name', 'last_name', 'email', 'phone'];
+     *
+     * $result = $this->updateFields($params, $existing, $fieldList);
+     * // Result: [
+     * //     'first_name' => 'Jane',
+     * //     'last_name' => 'Doe',
+     * //     'email' => 'john@example.com',
+     * //     'phone' => null
+     * // ]
+     * ```
+     */
+    // ToDo: use this function in project
+    public function updateFields(array $params, array $existing, array $fieldList): array
+    {
+        // If no specific field list is provided, merge all input fields into the existing data
+        if (empty($fieldList)) {
+            return array_merge($existing, $params);
+        }
+
+        // Ensure all fields exist in the existing array
+        $existing = $this->ensureFields($existing, $fieldList);
+
+        // Update existing values with new data
+        foreach ($params as $key => $value) {
+            if (in_array($key, $fieldList)) {
+                $existing[$key] = $value;
+            }
+        }
+
+        return $existing;
+    }
+
 
     /**
      * Makes an HTTP request using Laminas HTTP Client and returns the response.
