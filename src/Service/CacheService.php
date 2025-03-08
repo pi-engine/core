@@ -52,7 +52,7 @@ class CacheService implements ServiceInterface
     protected SimpleCacheDecorator $cache;
 
     /* @var string */
-    protected string $userKeyPattern = 'user-%s';
+    protected string $userKeyPattern = 'user_%s';
 
     /* @var array */
     protected array $config;

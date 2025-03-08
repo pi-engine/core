@@ -159,7 +159,7 @@ class ConfigService implements ServiceInterface
             ],
         ];
 
-    protected string $cacheKey = 'systemConfig';
+    protected string $cacheKey = 'system_config';
 
     protected int $cacheTtl = 60 * 60 * 24 * 365;
 
