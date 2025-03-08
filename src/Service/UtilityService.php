@@ -17,6 +17,7 @@ use Laminas\Http\Client\Adapter\Exception\InvalidArgumentException;
 use Laminas\Http\Client\Adapter\Exception\RuntimeException;
 use Laminas\Http\Client\Adapter\Exception\TimeoutException;
 use NumberFormatter;
+use Pi\Core\Service\Utility\Ip;
 use function class_exists;
 use function method_exists;
 use function preg_replace;
@@ -377,56 +378,8 @@ class UtilityService implements ServiceInterface
      */
     public function getClientIp(): string
     {
-        $ipCandidates = [];
-
-        // List of common headers used by proxies, cloud services, and load balancers
-        $headers = [
-            'HTTP_X_FORWARDED_FOR',       // Used by most proxies/load balancers
-            'HTTP_CLIENT_IP',             // Alternative client IP header
-            'HTTP_X_REAL_IP',             // Common in Nginx proxy setups
-            'HTTP_CF_CONNECTING_IP',      // Cloudflare
-            'HTTP_X_FORWARDED',           // Less common, but seen in some setups
-            'HTTP_FORWARDED_FOR',         // RFC-compliant proxy forwarding
-            'HTTP_FORWARDED',             // Another RFC-compliant variant
-            'HTTP_TRUE_CLIENT_IP',        // Akamai & some CDN providers
-            'HTTP_CF_PSEUDO_IPV4',        // Cloudflare's pseudo IPv4 header for IPv6 clients
-            'HTTP_X_CLUSTER_CLIENT_IP',   // Load balancers (e.g., AWS, Google Cloud, Kubernetes)
-            'HTTP_X_ORIGINAL_FORWARDED_FOR', // Edge cases (Google Cloud, Azure)
-        ];
-
-        // Extract potential IPs from headers
-        foreach ($headers as $header) {
-            if (!empty($_SERVER[$header])) {
-                $ipList = explode(',', $_SERVER[$header]);
-                foreach ($ipList as $ip) {
-                    $cleanIp = trim($ip);
-                    if (filter_var($cleanIp, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                        $ipCandidates[] = $cleanIp;
-                    }
-                }
-            }
-        }
-
-        // Check remote address (last fallback, may be unreliable if behind proxy)
-        if (!empty($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP)) {
-            $ipCandidates[] = $_SERVER['REMOTE_ADDR'];
-        }
-
-        // Remove duplicates
-        $ipCandidates = array_unique($ipCandidates);
-
-        // If running locally, allow loopback IPs
-        $isLocal = php_sapi_name() === 'cli' || in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1']);
-
-        // If multiple IPs exist, prioritize IPv4 over IPv6
-        foreach ($ipCandidates as $ip) {
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                return $ip; // Return first valid IPv4 address
-            }
-        }
-
-        // If no IPv4 found, return the first valid IP (likely IPv6)
-        return $ipCandidates[0] ?? ($isLocal ? '127.0.0.1' : '0.0.0.0');
+        $ip = new Ip();
+        return $ip->getClientIp();
     }
 
     /**

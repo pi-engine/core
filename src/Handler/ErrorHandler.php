@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pi\Core\Handler;
 
 use Pi\Core\Response\EscapingJsonResponse;
+use Pi\Core\Service\Utility\Ip as IpUtility;
 use Pi\Core\Service\UtilityService;
 use Pi\Logger\Service\LoggerService;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -89,13 +90,17 @@ class ErrorHandler implements RequestHandlerInterface
             $message = sprintf('%s - %s', $error['message'], $routeParams['title']);
         }
 
+        // Set ip class
+        $ipUtility = new IpUtility();
+        $clientIp  = $ipUtility->getClientIp();
+
         // Set log params
         $params = [
             'path'        => $path,
             'message'     => $message,
             'user_id'     => $attributes['account']['id'] ?? 0,
             'company_id'  => $attributes['company_authorization']['company_id'] ?? 0,
-            'ip'          => $this->utilityService->getClientIp(),
+            'ip'          => $clientIp,
             'route'       => $routeParams,
             'timestamp'   => $this->utilityService->getTime(),
             'time_create' => time(),

@@ -6,6 +6,7 @@ namespace Pi\Core\Security\Request;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\Utility\Ip as IpUtility;
 use Pi\Core\Service\UtilityService;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -41,8 +42,9 @@ class Ip implements RequestSecurityInterface
      */
     public function check(ServerRequestInterface $request, array $securityStream = []): array
     {
-        // Get client ip
-        $clientIp = $this->utilityService->getClientIp();
+        // Set ip class
+        $ipUtility = new IpUtility();
+        $clientIp  = $ipUtility->getClientIp();
 
         // Check ip is not lock
         if ($this->isIpLocked($clientIp)) {
@@ -55,7 +57,7 @@ class Ip implements RequestSecurityInterface
         }
 
         // Check allow-list
-        if ($this->isWhitelist($clientIp)) {
+        if ($ipUtility->isWhitelist($clientIp, $this->config['ip']['whitelist'])) {
             return [
                 'result' => true,
                 'name'   => $this->name,
@@ -68,7 +70,7 @@ class Ip implements RequestSecurityInterface
         }
 
         // Check blacklist
-        if ($this->isBlacklisted($clientIp)) {
+        if ($ipUtility->isBlacklisted($clientIp, $this->config['ip']['blacklist'])) {
             return [
                 'result' => false,
                 'name'   => $this->name,
@@ -104,87 +106,6 @@ class Ip implements RequestSecurityInterface
             return true;
         }
         return false;
-    }
-
-    /**
-     * Checks if the IP is in the allow-list.
-     *
-     * @param string $clientIp
-     *
-     * @return bool
-     */
-    public function isWhitelist(string $clientIp): bool
-    {
-        foreach ($this->config['ip']['whitelist'] as $entry) {
-            if ($this->ipMatches($clientIp, $entry)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the IP is in the blacklist.
-     *
-     * @param string $clientIp
-     *
-     * @return bool
-     */
-    public function isBlacklisted(string $clientIp): bool
-    {
-        foreach ($this->config['ip']['blacklist'] as $entry) {
-            if ($this->ipMatches($clientIp, $entry)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if an IP matches a given rule (single IP or range).
-     *
-     * @param string $clientIp
-     * @param string $rule
-     *
-     * @return bool
-     */
-    private function ipMatches(string $clientIp, string $rule): bool
-    {
-        if (strpos($rule, '/') !== false) {
-            // Handle CIDR notation for IP ranges
-            return $this->ipInRange($clientIp, $rule);
-        }
-
-        // Handle single IP addresses
-        return $clientIp === $rule;
-    }
-
-    /**
-     * Checks if an IP is within a specified IP range.
-     *
-     * @param string $clientIp
-     * @param string $cidr
-     *
-     * @return bool
-     */
-    private function ipInRange(string $clientIp, string $cidr): bool
-    {
-        [$range, $prefix] = explode('/', $cidr, 2);
-        $prefix = (int)$prefix;
-
-        // Convert IP addresses to binary format
-        $clientIp = inet_pton($clientIp);
-        $range    = inet_pton($range);
-
-        // Calculate the subnet mask
-        $mask = Ip . phpstr_repeat('1', $prefix) . str_repeat('0', 128 - $prefix);
-        $mask = pack('H*', str_pad(base_convert($mask, 2, 16), 32, '0', STR_PAD_LEFT));
-
-        // Apply the subnet mask to the range and IP
-        $range    = $range & $mask;
-        $clientIp = $clientIp & $mask;
-
-        return $range === $clientIp;
     }
 
     /**

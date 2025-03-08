@@ -6,6 +6,7 @@ namespace Pi\Core\Security\Request;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\Utility\Ip as IpUtility;
 use Pi\Core\Service\UtilityService;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -55,8 +56,12 @@ class RequestLimit implements RequestSecurityInterface
             ];
         }
 
+        // Set ip class
+        $ipUtility = new IpUtility();
+        $clientIp  = $ipUtility->getClientIp();
+
         // Set key
-        $key = $this->sanitizeKey("rate_limit_{$this->utilityService->getClientIp()}");
+        $key = $this->sanitizeKey("rate_limit_{$clientIp}");
 
         // Get and check key
         $cacheData = $this->cacheService->getItem($key);

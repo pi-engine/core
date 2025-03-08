@@ -99,6 +99,11 @@ return [
             'max_requests'     => 100,
             'rate_limit'       => 60, // Time window in seconds
         ],
+        'userData'        => [
+            'is_active'         => true,
+            'ignore_whitelist'  => true,
+            'geo_location_path' => $basePath . '/data/geoLite/GeoLite2-City.mmdb',
+        ],
         // Response
         'header'          => [
             'is_active' => true,
