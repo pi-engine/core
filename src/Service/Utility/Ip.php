@@ -59,7 +59,6 @@ class Ip implements ServiceInterface
         return $isLocal ? '127.0.0.1' : '0.0.0.0';
     }
 
-
     /**
      * Extracts potential IPs from HTTP headers.
      */
