@@ -63,7 +63,7 @@ class UserData implements RequestSecurityInterface
         $headers      = $request->getHeaders();
 
         // Set ip class
-        $ipUtility = new IpUtility();
+        $ipUtility = new IpUtility($this->cacheService);
         $clientIp  = $ipUtility->getClientIp();
 
         // Set user agent

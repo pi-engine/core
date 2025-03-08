@@ -6,6 +6,7 @@ namespace Pi\Core\Service\Utility;
 
 use Exception;
 use GeoIp2\Database\Reader;
+use Pi\Core\Service\CacheService;
 use Pi\Core\Service\ServiceInterface;
 
 class Ip implements ServiceInterface
@@ -17,8 +18,12 @@ class Ip implements ServiceInterface
             '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.',
         ];
 
-    public function __construct()
+    /* @var CacheService|null */
+    private ?CacheService $cacheService;
+
+    public function __construct(CacheService $cacheService = null)
     {
+        $this->cacheService = $cacheService;
     }
 
     /**
@@ -132,7 +137,15 @@ class Ip implements ServiceInterface
      */
     public function normalizeIp(string $ip): string
     {
-        return inet_ntop(inet_pton($ip));
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            return inet_ntop(inet_pton($ip));
+        }
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return long2ip(ip2long($ip)); // Ensure consistent format
+        }
+
+        return $ip; // In case of invalid IP
     }
 
     /**
@@ -162,6 +175,13 @@ class Ip implements ServiceInterface
      */
     public function getGeoIpData(string $ip, string $geoDbPath): array
     {
+        $cacheKey = $this->sanitizeKey("geo_ip_{$ip}");
+
+        // Check if cache service is available and if geo IP data is already cached
+        if ($this->cacheService && $this->cacheService->hasItem($cacheKey)) {
+            return $this->cacheService->getItem($cacheKey);
+        }
+
         if (!$this->isPublicIp($ip)) {
             return [
                 'result' => true,
@@ -194,19 +214,27 @@ class Ip implements ServiceInterface
             $reader = new Reader($geoDbPath);
             $record = $reader->city($ip);
 
+            // Set geo data
+            $geoData = [
+                'ip'           => $ip,
+                'country'      => $record->country->name ?? 'Unknown',
+                'country_code' => $record->country->isoCode ?? 'Unknown',
+                'city'         => $record->city->name ?? 'Unknown',
+                'region'       => $record->subdivisions[0]->name ?? 'Unknown',
+                'region_code'  => $record->subdivisions[0]->isoCode ?? 'Unknown',
+                'latitude'     => $record->location->latitude ?? 0,
+                'longitude'    => $record->location->longitude ?? 0,
+                'timezone'     => $record->location->timeZone ?? 'Unknown',
+            ];
+
+            // If cache is available, store the fetched data with a time-to-live (TTL)
+            if ($this->cacheService) {
+               $this->cacheService->setItem($cacheKey, $geoData, 3600); // 1 hour TTL
+            }
+
             return [
                 'result' => true,
-                'data'   => [
-                    'ip'           => $ip,
-                    'country'      => $record->country->name ?? 'Unknown',
-                    'country_code' => $record->country->isoCode ?? 'Unknown',
-                    'city'         => $record->city->name ?? 'Unknown',
-                    'region'       => $record->subdivisions[0]->name ?? 'Unknown',
-                    'region_code'  => $record->subdivisions[0]->isoCode ?? 'Unknown',
-                    'latitude'     => $record->location->latitude ?? 0,
-                    'longitude'    => $record->location->longitude ?? 0,
-                    'timezone'     => $record->location->timeZone ?? 'Unknown',
-                ],
+                'data'   => $geoData,
                 'error'  => [],
             ];
         } catch (Exception $e) {
@@ -265,5 +293,54 @@ class Ip implements ServiceInterface
     private function ipMatches(string $clientIp, string $rule): bool
     {
         return strpos($rule, '/') !== false ? $this->isIpInRange($clientIp, $rule) : $clientIp === $rule;
+    }
+
+    /**
+     * Checks if the given IP is from the specified country.
+     *
+     * @param string $ip The IP address to check.
+     * @param string $countryCode The two-letter country code (e.g., 'US').
+     * @param string $geoDbPath The path to the GeoIP database.
+     *
+     * @return bool True if the IP is from the specified country, false otherwise.
+     */
+    public function isIpFromCountry(string $ip, string $countryCode, string $geoDbPath): bool
+    {
+        $geoData = $this->getGeoIpData($ip, $geoDbPath);
+        return $geoData['result'] && strtoupper($geoData['data']['country_code']) === strtoupper($countryCode);
+    }
+
+    /**
+     * Checks if the request is using a proxy.
+     *
+     * @return bool True if the request is behind a proxy, false otherwise.
+     */
+    public function isUsingProxy(): bool
+    {
+        $proxyHeaders = [
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_REAL_IP',
+            'HTTP_X_CLUSTER_CLIENT_IP',
+        ];
+
+        foreach ($proxyHeaders as $header) {
+            if (!empty($_SERVER[$header])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Sanitizes the cache key to ensure it meets the allowed format.
+     *
+     * @param string $key The original key
+     *
+     * @return string The sanitized key
+     */
+    private function sanitizeKey(string $key): string
+    {
+        return preg_replace('/[^a-zA-Z0-9_]/', '_', $key);
     }
 }
