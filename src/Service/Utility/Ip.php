@@ -179,7 +179,11 @@ class Ip implements ServiceInterface
 
         // Check if cache service is available and if geo IP data is already cached
         if ($this->cacheService && $this->cacheService->hasItem($cacheKey)) {
-            return $this->cacheService->getItem($cacheKey);
+            return [
+                'result' => true,
+                'data'   => $this->cacheService->getItem($cacheKey),
+                'error'  => [],
+            ];
         }
 
         if (!$this->isPublicIp($ip)) {
