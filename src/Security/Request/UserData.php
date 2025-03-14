@@ -81,13 +81,33 @@ class UserData implements RequestSecurityInterface
         }
 
         // Set geo data
-        $geoData = $ipUtility->getGeoIpData($clientIp, $this->config['userData']['geo_location_path']);
-        if (!$geoData['result']) {
-            return [
-                'result' => false,
-                'name'   => $this->name,
-                'status' => 'unsuccessful',
-                'data'   => $geoData['error'],
+        if (
+            isset($this->config['userData']['geo_location_path'])
+            && !empty($this->config['userData']['geo_location_path'])
+            && file_exists($this->config['userData']['geo_location_path'])
+        ) {
+            $geoData = $ipUtility->getGeoIpData($clientIp, $this->config['userData']['geo_location_path']);
+            if (!$geoData['result']) {
+                return [
+                    'result' => false,
+                    'name'   => $this->name,
+                    'status' => 'unsuccessful',
+                    'data'   => $geoData['error'],
+                ];
+            }
+        } else {
+            $geoData = [
+                'data'   => [
+                    'ip'           => $clientIp,
+                    'country'      => 'Unknown',
+                    'country_code' => 'XX',
+                    'city'         => 'Unknown',
+                    'region'       => 'Unknown',
+                    'region_code'  => 'Unknown',
+                    'latitude'     => 0,
+                    'longitude'    => 0,
+                    'timezone'     => 'Unknown',
+                ],
             ];
         }
 
