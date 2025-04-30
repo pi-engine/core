@@ -296,7 +296,7 @@ class Ip implements ServiceInterface
      */
     private function ipMatches(string $clientIp, string $rule): bool
     {
-        return strpos($rule, '/') !== false ? $this->isIpInRange($clientIp, $rule) : $clientIp === $rule;
+        return str_contains($rule, '/') ? $this->isIpInRange($clientIp, $rule) : $clientIp === $rule;
     }
 
     /**
