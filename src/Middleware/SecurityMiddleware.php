@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pi\Core\Middleware;
 
 use Pi\Core\Handler\ErrorHandler;
+use Pi\Core\Security\Request\Csrf as RequestSecurityCsrf;
 use Pi\Core\Security\Request\Injection as RequestSecurityInjection;
 use Pi\Core\Security\Request\InputSizeLimit as RequestSecurityInputSizeLimit;
 use Pi\Core\Security\Request\InputValidation as RequestSecurityInputValidation;
@@ -16,6 +17,7 @@ use Pi\Core\Security\Request\Xss as RequestSecurityXss;
 use Pi\Core\Security\Response\Compress as ResponseCompress;
 use Pi\Core\Security\Response\Headers as ResponseHeaders;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\CsrfService;
 use Pi\Core\Service\UtilityService;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -38,6 +40,9 @@ class SecurityMiddleware implements MiddlewareInterface
     /** @var UtilityService */
     protected UtilityService $utilityService;
 
+    /** @var CsrfService */
+    protected CsrfService $csrfService;
+
     /** @var ErrorHandler */
     protected ErrorHandler $errorHandler;
 
@@ -49,6 +54,7 @@ class SecurityMiddleware implements MiddlewareInterface
         StreamFactoryInterface   $streamFactory,
         CacheService             $cacheService,
         UtilityService           $utilityService,
+        CsrfService              $csrfService,
         ErrorHandler             $errorHandler,
                                  $config
     ) {
@@ -56,6 +62,7 @@ class SecurityMiddleware implements MiddlewareInterface
         $this->streamFactory   = $streamFactory;
         $this->cacheService    = $cacheService;
         $this->utilityService  = $utilityService;
+        $this->csrfService     = $csrfService;
         $this->errorHandler    = $errorHandler;
         $this->config          = $config;
     }
@@ -122,6 +129,9 @@ class SecurityMiddleware implements MiddlewareInterface
         }
         if (isset($this->config['inputValidation']['is_active']) && $this->config['inputValidation']['is_active']) {
             $list['inputValidation'] = new RequestSecurityInputValidation($this->config);
+        }
+        if (isset($this->config['csrf']['is_active']) && $this->config['csrf']['is_active']) {
+            $list['csrf'] = new RequestSecurityCsrf($this->csrfService, $this->config);
         }
 
         return $list;

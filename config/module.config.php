@@ -33,6 +33,7 @@ return [
             Service\UtilityService::class                  => Factory\Service\UtilityServiceFactory::class,
             Service\TranslatorService::class               => Factory\Service\TranslatorServiceFactory::class,
             Service\SignatureService::class                => Factory\Service\SignatureServiceFactory::class,
+            Service\CsrfService::class                     => Factory\Service\CsrfServiceFactory::class,
             Handler\ErrorHandler::class                    => Factory\Handler\ErrorHandlerFactory::class,
             Handler\InstallerHandler::class                => Factory\Handler\InstallerHandlerFactory::class,
             Handler\Admin\Config\ListHandler::class        => Factory\Handler\Admin\Config\ListHandlerFactory::class,

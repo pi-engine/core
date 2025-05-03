@@ -8,6 +8,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Handler\ErrorHandler;
 use Pi\Core\Middleware\SecurityMiddleware;
 use Pi\Core\Service\CacheService;
+use Pi\Core\Service\CsrfService;
 use Pi\Core\Service\UtilityService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -37,6 +38,7 @@ class SecurityMiddlewareFactory implements FactoryInterface
             $container->get(StreamFactoryInterface::class),
             $container->get(CacheService::class),
             $container->get(UtilityService::class),
+            $container->get(CsrfService::class),
             $container->get(ErrorHandler::class),
             $config
         );
