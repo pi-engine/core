@@ -49,13 +49,25 @@ class Csrf implements RequestSecurityInterface
             ];
         }
 
-        // Get request and query body
+        // Get route params
         $requestParams = $request->getParsedBody();
-        $csrfToken     = $requestParams['csrf_token'] ?? $request->getHeaderLine('X-Csrf-Token') ?? null;
+        $routeMatch    = $request->getAttribute('Laminas\Router\RouteMatch');
+        $routeParams   = $routeMatch->getParams();
+        $pageKey       = sprintf(
+            '%s-%s-%s-%s',
+            $routeParams['section'],
+            $routeParams['module'],
+            $routeParams['package'],
+            $routeParams['handler']
+        );
 
-        // Do check
-        if (!empty($csrfToken)) {
-            if (!$this->csrfService->validateCsrfToken($csrfToken, $securityStream['userData']['data'])) {
+        // Csrf check is required?
+        if (in_array($pageKey, $this->config['csrf']['check_list'])) {
+            // Get request and query body
+            $csrfToken = $requestParams['csrf_token'] ?? $request->getHeaderLine('X-Csrf-Token') ?? null;
+
+            // Do check
+            if (empty($csrfToken) || !$this->csrfService->validateCsrfToken($csrfToken, $securityStream['userData']['data'])) {
                 return [
                     'result' => false,
                     'name'   => $this->name,

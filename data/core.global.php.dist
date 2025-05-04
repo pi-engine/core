@@ -107,6 +107,9 @@ return [
         'csrf'            => [
             'is_active'        => true,
             'ignore_whitelist' => true,
+            'check_list' => [
+                //'api-user-security-csrf'
+            ]
         ],
         // Response
         'header'          => [
