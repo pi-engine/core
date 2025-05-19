@@ -46,5 +46,16 @@ return [
                 'admin',
             ],
         ],
+        [
+            'title'      => 'Admin module list',
+            'module'     => 'core',
+            'section'    => 'admin',
+            'package'    => 'module',
+            'handler'    => 'list',
+            'permission' => 'admin-core-module-list',
+            'role'       => [
+                'admin',
+            ],
+        ],
     ],
 ];

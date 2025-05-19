@@ -40,6 +40,7 @@ return [
             Handler\Admin\Config\UpdateHandler::class      => Factory\Handler\Admin\Config\UpdateHandlerFactory::class,
             Handler\Admin\Signature\CheckHandler::class    => Factory\Handler\Admin\Signature\CheckHandlerFactory::class,
             Handler\Admin\Signature\UpdateHandler::class   => Factory\Handler\Admin\Signature\UpdateHandlerFactory::class,
+            Handler\Admin\Module\ListHandler::class   => Factory\Handler\Admin\Module\ListHandlerFactory::class,
         ],
     ],
     'router'          => [
@@ -158,7 +159,37 @@ return [
                             ],
                         ],
                     ],
-
+                    'module'    => [
+                        'type'         => Literal::class,
+                        'options'      => [
+                            'route'    => '/module',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'list'   => [
+                                'type'    => Literal::class,
+                                'options' => [
+                                    'route'    => '/list',
+                                    'defaults' => [
+                                        'title'      => 'Admin module list',
+                                        'module'     => 'core',
+                                        'section'    => 'admin',
+                                        'package'    => 'module',
+                                        'handler'    => 'list',
+                                        'permission' => 'admin-core-module-list',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Module\ListHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                     // Admin installer
                     'installer' => [
                         'type'    => Literal::class,
