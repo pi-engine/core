@@ -427,14 +427,17 @@ class UtilityService implements ServiceInterface
     /**
      * Check password is strong
      *
-     * @param $password
+     * @param int|string $password
+     * @param string     $pattern
      *
      * @return bool
      */
-    public function isPasswordStrong($password): bool
+    public function isPasswordStrong(int|string $password, string $pattern = ''): bool
     {
-        $pattern = '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^a-zA-Z0-9\s]).+$/';
+        // Check and set a pattern
+        $pattern = empty($pattern) ? '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^a-zA-Z0-9\s]).+$/' : $pattern;
 
+        // Check strong
         return preg_match($pattern, $password) === 1;
     }
 
