@@ -39,6 +39,8 @@ class UtilityService implements ServiceInterface
             'normalize_chars' => true,
             // Force add uuid suffix
             'uuid_suffix'     => false,
+            // Optional prefix, empty by default
+            'prefix'          => '',
         ];
 
     protected array $slugPattern
@@ -292,9 +294,9 @@ class UtilityService implements ServiceInterface
     }
 
     /**
-     * @param string $text    Text to be cleaned
-     * @param array  $options
-     * @param array  $pattern Custom pattern array
+     * @param string|null $text    Text to be cleaned
+     * @param array       $options
+     * @param array       $pattern Custom pattern array
      *
      * @return string
      */
