@@ -18,6 +18,7 @@ use Laminas\Http\Client\Adapter\Exception\RuntimeException;
 use Laminas\Http\Client\Adapter\Exception\TimeoutException;
 use NumberFormatter;
 use Pi\Core\Service\Utility\Ip;
+use Symfony\Component\Uid\Uuid;
 use function class_exists;
 use function method_exists;
 use function preg_replace;
@@ -36,6 +37,92 @@ class UtilityService implements ServiceInterface
             'force_lower'     => true,
             // Force normalize chars
             'normalize_chars' => true,
+            // Force add uuid suffix
+            'uuid_suffix'     => false,
+        ];
+
+    protected array $slugPattern
+        = [
+            'Š' => 'S',
+            'š' => 's',
+            'Ð' => 'Dj',
+            'Ž' => 'Z',
+            'ž' => 'z',
+            'À' => 'A',
+            'Á' => 'A',
+            'Â' => 'A',
+            'Ã' => 'A',
+            'Ä' => 'A',
+            'Å' => 'A',
+            'Æ' => 'A',
+            'Ç' => 'C',
+            'È' => 'E',
+            'É' => 'E',
+            'Ê' => 'E',
+            'Ë' => 'E',
+            'Ì' => 'I',
+            'Í' => 'I',
+            'Î' => 'I',
+            'Ï' => 'I',
+            'Ñ' => 'N',
+            'Ń' => 'N',
+            'Ò' => 'O',
+            'Ó' => 'O',
+            'Ô' => 'O',
+            'Õ' => 'O',
+            'Ö' => 'O',
+            'Ø' => 'O',
+            'Ù' => 'U',
+            'Ú' => 'U',
+            'Û' => 'U',
+            'Ü' => 'U',
+            'Ý' => 'Y',
+            'Þ' => 'B',
+            'ß' => 'Ss',
+            'à' => 'a',
+            'á' => 'a',
+            'â' => 'a',
+            'ã' => 'a',
+            'ä' => 'a',
+            'å' => 'a',
+            'æ' => 'a',
+            'ç' => 'c',
+            'è' => 'e',
+            'é' => 'e',
+            'ê' => 'e',
+            'ë' => 'e',
+            'ì' => 'i',
+            'í' => 'i',
+            'î' => 'i',
+            'ï' => 'i',
+            'ð' => 'o',
+            'ñ' => 'n',
+            'ń' => 'n',
+            'ò' => 'o',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ö' => 'o',
+            'ø' => 'o',
+            'ù' => 'u',
+            'ú' => 'u',
+            'û' => 'u',
+            'ü' => 'u',
+            'ý' => 'y',
+            'ý' => 'y',
+            'þ' => 'b',
+            'ÿ' => 'y',
+            'ƒ' => 'f',
+            'ă' => 'a',
+            'î' => 'i',
+            'â' => 'a',
+            'ș' => 's',
+            'ț' => 't',
+            'Ă' => 'A',
+            'Î' => 'I',
+            'Â' => 'A',
+            'Ș' => 'S',
+            'Ț' => 'T',
         ];
 
     public function __construct($config)
@@ -211,111 +298,48 @@ class UtilityService implements ServiceInterface
      *
      * @return string
      */
-    public function slug(string $text, array $options = [], array $pattern = []): string
+    public function slug(string|null $text = '', array $options = [], array $pattern = []): string
     {
-        $options = empty($options) ? $this->slugOptions : $options;
+        $uuid = (string) Uuid::v7();
 
-        // List of normalize chars
-        if (empty($pattern)) {
-            $pattern = [
-                'Š' => 'S',
-                'š' => 's',
-                'Ð' => 'Dj',
-                'Ž' => 'Z',
-                'ž' => 'z',
-                'À' => 'A',
-                'Á' => 'A',
-                'Â' => 'A',
-                'Ã' => 'A',
-                'Ä' => 'A',
-                'Å' => 'A',
-                'Æ' => 'A',
-                'Ç' => 'C',
-                'È' => 'E',
-                'É' => 'E',
-                'Ê' => 'E',
-                'Ë' => 'E',
-                'Ì' => 'I',
-                'Í' => 'I',
-                'Î' => 'I',
-                'Ï' => 'I',
-                'Ñ' => 'N',
-                'Ń' => 'N',
-                'Ò' => 'O',
-                'Ó' => 'O',
-                'Ô' => 'O',
-                'Õ' => 'O',
-                'Ö' => 'O',
-                'Ø' => 'O',
-                'Ù' => 'U',
-                'Ú' => 'U',
-                'Û' => 'U',
-                'Ü' => 'U',
-                'Ý' => 'Y',
-                'Þ' => 'B',
-                'ß' => 'Ss',
-                'à' => 'a',
-                'á' => 'a',
-                'â' => 'a',
-                'ã' => 'a',
-                'ä' => 'a',
-                'å' => 'a',
-                'æ' => 'a',
-                'ç' => 'c',
-                'è' => 'e',
-                'é' => 'e',
-                'ê' => 'e',
-                'ë' => 'e',
-                'ì' => 'i',
-                'í' => 'i',
-                'î' => 'i',
-                'ï' => 'i',
-                'ð' => 'o',
-                'ñ' => 'n',
-                'ń' => 'n',
-                'ò' => 'o',
-                'ó' => 'o',
-                'ô' => 'o',
-                'õ' => 'o',
-                'ö' => 'o',
-                'ø' => 'o',
-                'ù' => 'u',
-                'ú' => 'u',
-                'û' => 'u',
-                'ü' => 'u',
-                'ý' => 'y',
-                'ý' => 'y',
-                'þ' => 'b',
-                'ÿ' => 'y',
-                'ƒ' => 'f',
-                'ă' => 'a',
-                'î' => 'i',
-                'â' => 'a',
-                'ș' => 's',
-                'ț' => 't',
-                'Ă' => 'A',
-                'Î' => 'I',
-                'Â' => 'A',
-                'Ș' => 'S',
-                'Ț' => 'T',
-            ];
+        // Merge default slug options with user-defined ones (user overrides default)
+        $options = array_merge($this->slugOptions, $options);
+        $pattern = $pattern ?: $this->slugPattern;
+
+        // Prepare prefix if provided
+        $prefix = '';
+        if (!empty($options['prefix']) && is_string($options['prefix'])) {
+            $prefix = rtrim($options['prefix'], '-') . '-';
         }
 
-        // Strip HTML tags and remove unrecognizable characters
+        // Determine base text, optionally appending a UUID
+        if (!is_string($text) || trim($text) === '') {
+            $text = $uuid;
+        } elseif (!empty($options['uuid_suffix'])) {
+            $text = rtrim($text, '-') . '-' . $uuid;
+        }
+
+        // Strip HTML and unwanted characters
         $text = trim($this->strip($text));
 
-        // Normalize chars
-        if (!empty($options['normalize_chars'])) {
+        // Replace slashes and multiple spaces with a single dash
+        $text = preg_replace('#[\/\s]+#', '-', $text);
+        if ($text === null) {
+            $text = $uuid; // fallback in case preg_replace fails
+        }
+
+        // Normalize special characters if requested
+        if (!empty($options['normalize_chars']) && is_array($pattern)) {
             $text = strtr($text, $pattern);
         }
 
-        // Transform to lower case
+        // Convert to lowercase if requested
         if (!empty($options['force_lower'])) {
-            $text = strtolower($text);
+            $text = mb_strtolower($text, 'UTF-8');
         }
 
-        // Transform multi-spaces to slash
-        return preg_replace('/[\s]+/', '-', $text);
+        // Prepend prefix if available
+        return $prefix . $text;
     }
 
     /**

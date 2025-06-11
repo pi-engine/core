@@ -34,13 +34,14 @@ return [
             Service\TranslatorService::class               => Factory\Service\TranslatorServiceFactory::class,
             Service\SignatureService::class                => Factory\Service\SignatureServiceFactory::class,
             Service\CsrfService::class                     => Factory\Service\CsrfServiceFactory::class,
+            Service\MessageBrokerService::class            => Factory\Service\MessageBrokerServiceFactory::class,
             Handler\ErrorHandler::class                    => Factory\Handler\ErrorHandlerFactory::class,
             Handler\InstallerHandler::class                => Factory\Handler\InstallerHandlerFactory::class,
             Handler\Admin\Config\ListHandler::class        => Factory\Handler\Admin\Config\ListHandlerFactory::class,
             Handler\Admin\Config\UpdateHandler::class      => Factory\Handler\Admin\Config\UpdateHandlerFactory::class,
             Handler\Admin\Signature\CheckHandler::class    => Factory\Handler\Admin\Signature\CheckHandlerFactory::class,
             Handler\Admin\Signature\UpdateHandler::class   => Factory\Handler\Admin\Signature\UpdateHandlerFactory::class,
-            Handler\Admin\Module\ListHandler::class   => Factory\Handler\Admin\Module\ListHandlerFactory::class,
+            Handler\Admin\Module\ListHandler::class        => Factory\Handler\Admin\Module\ListHandlerFactory::class,
         ],
     ],
     'router'          => [
@@ -166,7 +167,7 @@ return [
                             'defaults' => [],
                         ],
                         'child_routes' => [
-                            'list'   => [
+                            'list' => [
                                 'type'    => Literal::class,
                                 'options' => [
                                     'route'    => '/list',
