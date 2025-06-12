@@ -13,4 +13,9 @@ class MessageBrokerService implements ServiceInterface
     {
         $this->config = $config;
     }
+
+    public function streamMessage($event, $document): void
+    {
+
+    }
 }
