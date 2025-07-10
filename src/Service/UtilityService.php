@@ -572,9 +572,9 @@ class UtilityService implements ServiceInterface
      *
      * $result = $this->ensureFields($params, $fieldList);
      * // Result: [
-     * //     'first_name' => 'John',
-     * //     'last_name' => null,
-     * //     'email' => null
+     * // 'first_name' => 'John',
+     * // 'last_name' => null,
+     * // 'email' => null
      * // ]
      * ```
      */
@@ -613,10 +613,10 @@ class UtilityService implements ServiceInterface
      *
      * $result = $this->updateFields($params, $existing, $fieldList);
      * // Result: [
-     * //     'first_name' => 'Jane',
-     * //     'last_name' => 'Doe',
-     * //     'email' => 'john@example.com',
-     * //     'phone' => null
+     * // 'first_name' => 'Jane',
+     * // 'last_name' => 'Doe',
+     * // 'email' => 'john@example.com',
+     * // 'phone' => null
      * // ]
      * ```
      */
@@ -641,6 +641,28 @@ class UtilityService implements ServiceInterface
         return $existing;
     }
 
+    /**
+     * Sorts an associative array by a custom field list.
+     *
+     * This function ensures the output contains only the fields defined in $fieldList,
+     * sorted in the specified order. If a key is missing in $params, it will be added
+     * with a null value. Extra keys in $params that are not in $fieldList will be removed.
+     *
+     * @param array $params     The associative array to sort and filter.
+     * @param array $fieldList  The ordered list of allowed keys.
+     *
+     * @return array The sorted and filtered associative array.
+     */
+    function sortFields(array $params, array $fieldList): array
+    {
+        $filtered = [];
+
+        foreach ($fieldList as $key) {
+            $filtered[$key] = $params[$key] ?? null;
+        }
+
+        return $filtered;
+    }
 
     /**
      * Makes an HTTP request using Laminas HTTP Client and returns the response.
