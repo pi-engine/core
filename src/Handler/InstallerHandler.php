@@ -24,8 +24,8 @@ class InstallerHandler implements RequestHandlerInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface $streamFactory,
-        InstallerService $installerService
+        StreamFactoryInterface   $streamFactory,
+        InstallerService         $installerService
     ) {
         $this->responseFactory  = $responseFactory;
         $this->streamFactory    = $streamFactory;

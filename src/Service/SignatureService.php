@@ -24,12 +24,12 @@ class SignatureService implements ServiceInterface
 
     public function __construct(
         SignatureRepositoryInterface $signatureRepositoryInterface,
-        Signature           $signature,
-                            $config
+        Signature                    $signature,
+                                     $config
     ) {
         $this->signatureRepositoryInterface = $signatureRepositoryInterface;
-        $this->signature           = $signature;
-        $this->config              = $config;
+        $this->signature                    = $signature;
+        $this->config                       = $config;
     }
 
     public function checkAllSignatures($params): array

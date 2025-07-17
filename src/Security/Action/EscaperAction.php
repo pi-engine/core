@@ -35,7 +35,7 @@ class EscaperAction implements ActionSecurityInterface
         array_walk_recursive($data, function (&$item) use ($escaper, $entityMap) {
             if (is_string($item)) {
                 $escaped = $escaper->escapeHtml($item);
-                $item = strtr($escaped, $entityMap);
+                $item    = strtr($escaped, $entityMap);
             }
         });
 

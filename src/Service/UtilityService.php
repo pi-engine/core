@@ -302,7 +302,7 @@ class UtilityService implements ServiceInterface
      */
     public function slug(string|null $text = '', array $options = [], array $pattern = []): string
     {
-        $uuid = (string) Uuid::v7();
+        $uuid = (string)Uuid::v7();
 
         // Merge default slug options with user-defined ones (user overrides default)
         $options = array_merge($this->slugOptions, $options);
@@ -648,8 +648,8 @@ class UtilityService implements ServiceInterface
      * sorted in the specified order. If a key is missing in $params, it will be added
      * with a null value. Extra keys in $params that are not in $fieldList will be removed.
      *
-     * @param array $params     The associative array to sort and filter.
-     * @param array $fieldList  The ordered list of allowed keys.
+     * @param array $params    The associative array to sort and filter.
+     * @param array $fieldList The ordered list of allowed keys.
      *
      * @return array The sorted and filtered associative array.
      */

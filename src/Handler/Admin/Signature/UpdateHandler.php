@@ -26,12 +26,12 @@ class UpdateHandler implements RequestHandlerInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface $streamFactory,
-        SignatureService $signatureService
+        StreamFactoryInterface   $streamFactory,
+        SignatureService         $signatureService
     ) {
-        $this->responseFactory = $responseFactory;
-        $this->streamFactory   = $streamFactory;
-        $this->signatureService    = $signatureService;
+        $this->responseFactory  = $responseFactory;
+        $this->streamFactory    = $streamFactory;
+        $this->signatureService = $signatureService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -46,7 +46,7 @@ class UpdateHandler implements RequestHandlerInterface
         $result = [
             'result' => true,
             'data'   => [
-                'message' => 'All tables updated !'
+                'message' => 'All tables updated !',
             ],
             'error'  => [],
         ];

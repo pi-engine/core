@@ -233,7 +233,7 @@ class Ip implements ServiceInterface
 
             // If cache is available, store the fetched data with a time-to-live (TTL)
             if ($this->cacheService) {
-               $this->cacheService->setItem($cacheKey, $geoData, 3600); // 1 hour TTL
+                $this->cacheService->setItem($cacheKey, $geoData, 3600); // 1 hour TTL
             }
 
             return [
@@ -302,9 +302,9 @@ class Ip implements ServiceInterface
     /**
      * Checks if the given IP is from the specified country.
      *
-     * @param string $ip The IP address to check.
+     * @param string $ip          The IP address to check.
      * @param string $countryCode The two-letter country code (e.g., 'US').
-     * @param string $geoDbPath The path to the GeoIP database.
+     * @param string $geoDbPath   The path to the GeoIP database.
      *
      * @return bool True if the IP is from the specified country, false otherwise.
      */

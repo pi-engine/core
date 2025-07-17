@@ -29,8 +29,8 @@ class ConfigServiceFactory implements FactoryInterface
         $config = $container->get('config');
         $config = array_merge(
             $config['global'] ?? [],
-                $config['media'] ?? [],
-                $config['account']['password'] ?? []
+            $config['media'] ?? [],
+            $config['account']['password'] ?? []
         );
 
         return new ConfigService(

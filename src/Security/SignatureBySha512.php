@@ -10,10 +10,10 @@ use RuntimeException;
 
 class SignatureBySha512
 {
-    private string $method;
+    private string  $method;
     private ?string $privateKeyPath = null;
-    private ?string $publicKeyPath = null;
-    private ?string $hmacSecret = null;
+    private ?string $publicKeyPath  = null;
+    private ?string $hmacSecret     = null;
 
     public function __construct(array $config)
     {
@@ -21,7 +21,7 @@ class SignatureBySha512
 
         if ($this->method === 'rsa') {
             $this->privateKeyPath = $config['private_key'] ?? throw new RuntimeException('Private key path not set.');
-            $this->publicKeyPath = $config['public_key'] ?? throw new RuntimeException('Public key path not set.');
+            $this->publicKeyPath  = $config['public_key'] ?? throw new RuntimeException('Public key path not set.');
 
             // Generate keys if they do not exist
             if (!file_exists($this->privateKeyPath) || !file_exists($this->publicKeyPath)) {
@@ -38,6 +38,7 @@ class SignatureBySha512
      * Sign data using the configured method
      *
      * @param array $data Associative array of record data
+     *
      * @return string Base64-encoded signature
      */
     public function signData(array $data): string
@@ -62,14 +63,15 @@ class SignatureBySha512
     /**
      * Verify a signature against the provided data
      *
-     * @param array $data The original data
+     * @param array  $data      The original data
      * @param string $signature The stored signature
+     *
      * @return bool True if valid, false otherwise
      */
     public function verifySignature(array $data, string $signature): bool
     {
         ksort($data);
-        $dataString = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $dataString       = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $decodedSignature = base64_decode($signature);
 
         if ($this->method === 'rsa') {
@@ -95,7 +97,7 @@ class SignatureBySha512
     private function createKeys(): void
     {
         $privateKey = RSA::createKey(4096);
-        $publicKey = $privateKey->getPublicKey();
+        $publicKey  = $privateKey->getPublicKey();
 
         file_put_contents($this->privateKeyPath, $privateKey);
         file_put_contents($this->publicKeyPath, $publicKey);

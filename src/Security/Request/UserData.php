@@ -97,7 +97,7 @@ class UserData implements RequestSecurityInterface
             }
         } else {
             $geoData = [
-                'data'   => [
+                'data' => [
                     'ip'           => $clientIp,
                     'country'      => 'Unknown',
                     'country_code' => 'XX',

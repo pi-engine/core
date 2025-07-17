@@ -26,12 +26,12 @@ class UpdateHandler implements RequestHandlerInterface
 
     public function __construct(
         ResponseFactoryInterface $responseFactory,
-        StreamFactoryInterface $streamFactory,
-        ConfigService $configService
+        StreamFactoryInterface   $streamFactory,
+        ConfigService            $configService
     ) {
         $this->responseFactory = $responseFactory;
         $this->streamFactory   = $streamFactory;
-        $this->configService    = $configService;
+        $this->configService   = $configService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface

@@ -25,13 +25,13 @@ class RequestLimit implements RequestSecurityInterface
     protected string $name = 'requestLimit';
 
     public function __construct(
-        CacheService $cacheService,
+        CacheService   $cacheService,
         UtilityService $utilityService,
-                     $config
+                       $config
     ) {
-        $this->cacheService = $cacheService;
+        $this->cacheService   = $cacheService;
         $this->utilityService = $utilityService;
-        $this->config       = $config;
+        $this->config         = $config;
     }
 
     /**

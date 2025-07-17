@@ -174,8 +174,8 @@ class SignatureRepository implements SignatureRepositoryInterface
             if ($verify) {
                 $result['verified'] = $result['verified'] + 1;
             } else {
-                $result['unverified']       = $result['unverified'] + 1;
-                $result['list'][] = $row['id'];
+                $result['unverified'] = $result['unverified'] + 1;
+                $result['list'][]     = $row['id'];
             }
         }
 
