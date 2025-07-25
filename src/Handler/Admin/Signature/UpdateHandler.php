@@ -47,6 +47,7 @@ class UpdateHandler implements RequestHandlerInterface
             'result' => true,
             'data'   => [
                 'message' => 'All tables updated !',
+                'key'     => 'all-tables-updated',
             ],
             'error'  => [],
         ];

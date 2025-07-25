@@ -685,7 +685,11 @@ class UtilityService implements ServiceInterface
             return [
                 'result' => false,
                 'data'   => [],
-                'error'  => ['message' => "Invalid HTTP method: {$method}"],
+                'error'  => [
+                    'message' => "Invalid HTTP method: {$method}",
+                    'key'     => 'invalid-http-method',
+                    'method'  => $method,
+                ],
             ];
         }
 
@@ -694,7 +698,11 @@ class UtilityService implements ServiceInterface
             return [
                 'result' => false,
                 'data'   => [],
-                'error'  => ['message' => "Invalid URL: {$url}"],
+                'error'  => [
+                    'message' => "Invalid URL: {$url}",
+                    'key'     => 'invalid-url',
+                    'url'     => $url,
+                ],
             ];
         }
 
@@ -745,6 +753,7 @@ class UtilityService implements ServiceInterface
                     'data'   => [],
                     'error'  => [
                         'message'  => 'Invalid or empty JSON response',
+                        'key'      => 'invalid-or-empty-json-response',
                         'response' => $responseBody,
                     ],
                 ];
@@ -754,8 +763,10 @@ class UtilityService implements ServiceInterface
                 'result' => false,
                 'data'   => [],
                 'error'  => [
-                    'message'  => "HTTP error with status code {$statusCode}",
-                    'response' => $response->getBody(),
+                    'message'     => "HTTP error with status code {$statusCode}",
+                    'key'         => 'http-error-with-status-code',
+                    'status_code' => $statusCode,
+                    'response'    => $response->getBody(),
                 ],
             ];
         } catch (TimeoutException $e) {
@@ -764,6 +775,7 @@ class UtilityService implements ServiceInterface
                 'data'   => [],
                 'error'  => [
                     'message'  => 'Request timed out',
+                    'key'      => 'request-timed-out',
                     'response' => $e->getMessage(),
                 ],
             ];
@@ -773,6 +785,7 @@ class UtilityService implements ServiceInterface
                 'data'   => [],
                 'error'  => [
                     'message'  => 'Runtime error occurred',
+                    'key'      => 'runtime-error-occurred',
                     'response' => $e->getMessage(),
                 ],
             ];
@@ -782,6 +795,7 @@ class UtilityService implements ServiceInterface
                 'data'   => [],
                 'error'  => [
                     'message'  => 'Invalid argument passed to the HTTP client',
+                    'key'      => 'invalid-argument-passed-to-the-http-client',
                     'response' => $e->getMessage(),
                 ],
             ];
@@ -791,6 +805,7 @@ class UtilityService implements ServiceInterface
                 'data'   => [],
                 'error'  => [
                     'message'  => 'An error occurred: ' . $e->getMessage(),
+                    'key'      => 'an-error-occurred',
                     'response' => $e->getMessage(),
                 ],
             ];

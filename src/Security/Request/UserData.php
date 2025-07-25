@@ -173,6 +173,7 @@ class UserData implements RequestSecurityInterface
                 'data'   => [],
                 'error'  => [
                     'message' => 'Device Data lookup failed: ' . $e->getMessage(),
+                    'key'     => 'device-data-lookup-failed',
                 ],
             ];
         }

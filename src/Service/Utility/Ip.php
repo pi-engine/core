@@ -210,6 +210,7 @@ class Ip implements ServiceInterface
                 'data'   => [],
                 'error'  => [
                     'message' => 'GeoIP database not found',
+                    'key'     => 'geoip-database-not-found',
                 ],
             ];
         }
@@ -247,6 +248,7 @@ class Ip implements ServiceInterface
                 'data'   => [],
                 'error'  => [
                     'message' => 'GeoIP lookup failed: ' . $e->getMessage(),
+                    'key'     => 'geoip-lookup-failed',
                 ],
             ];
         }

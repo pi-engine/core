@@ -57,6 +57,7 @@ class InstallerMiddleware implements MiddlewareInterface
                 'error',
                 [
                     'message' => 'You dont have access to this area !',
+                    'key'     => 'you-dont-have-access-to-this-area',
                     'code'    => StatusCodeInterface::STATUS_FORBIDDEN,
                 ]
             );
