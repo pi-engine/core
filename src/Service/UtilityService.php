@@ -16,6 +16,7 @@ use Laminas\Http\Client\Adapter\Curl;
 use Laminas\Http\Client\Adapter\Exception\InvalidArgumentException;
 use Laminas\Http\Client\Adapter\Exception\RuntimeException;
 use Laminas\Http\Client\Adapter\Exception\TimeoutException;
+use Laminas\Hydrator\ClassMethodsHydrator;
 use NumberFormatter;
 use Pi\Core\Service\Utility\Ip;
 use Symfony\Component\Uid\Uuid;
@@ -541,8 +542,8 @@ class UtilityService implements ServiceInterface
      *
      * $filteredParams = $this->filterParams($params, $fieldList);
      * // Result: [
-     * //     'first_name' => 'John',
-     * //     'last_name' => 'Doe'
+     * // 'first_name' => 'John',
+     * // 'last_name' => 'Doe'
      * // ]
      * ```
      */
@@ -665,17 +666,15 @@ class UtilityService implements ServiceInterface
     }
 
     /**
-     * Canonizes an object or array into a structured associative array using a fixed list of fields.
+     * Canonizes an object into a structured associative array using Laminas\Hydrator.
      *
-     * This method extracts values for the given fields from either an object (via getter methods)
-     * or an associative array. It also handles special cases like:
-     * - Decoding the `information` field from JSON string to array (if present and non-empty).
-     * - Formatting `time_create` and `time_update` fields into human-readable strings.
+     * This method extracts fields from an object using getter methods via ClassMethodsHydrator.
+     * It also handles custom post-processing for fields like `information` and time formatting.
      *
-     * @param mixed $item The item to canonize (object or array).
-     * @param array $fields The list of fields to extract and include in the result.
+     * @param object|array $item The object (preferred) or arrays to canonize.
+     * @param array $fields The list of fields to extract.
      *
-     * @return array The canonized array containing the specified fields and derived fields.
+     * @return array Canonized data with selected fields and custom formatting.
      */
     public function canonize(mixed $item, array $fields): array
     {
@@ -683,34 +682,36 @@ class UtilityService implements ServiceInterface
             return [];
         }
 
-        $result = [];
+        $data = [];
+        if (is_object($item)) {
+            $hydrator = new ClassMethodsHydrator();
+            $extracted = $hydrator->extract($item);
+        } elseif (is_array($item)) {
+            $extracted = $item;
+        } else {
+            return [];
+        }
+
+        // Filter only requested fields
         foreach ($fields as $field) {
-            $value = null;
-            if (is_object($item)) {
-                $getter = 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
-                $value = method_exists($item, $getter) ? $item->$getter() : null;
-            } elseif (is_array($item)) {
-                $value = $item[$field] ?? null;
-            }
-
-            $result[$field] = $value;
+            $data[$field] = $extracted[$field] ?? null;
         }
 
-        // Decode `information` field if exists and is not empty
-        if (in_array('information', $fields) && !empty($result['information'])) {
-            $result['information'] = json_decode($result['information'], true);
+        // Decode information if present
+        if (!empty($data['information'])) {
+            $data['information'] = json_decode($data['information'], true);
         }
 
-        // Format time fields
-        if (in_array('time_create', $fields)) {
-            $result['time_create_view'] = $this->date($result['time_create']);
+        // Add formatted timestamps
+        if (isset($data['time_create'])) {
+            $data['time_create_view'] = $this->date($data['time_create']);
         }
 
-        if (in_array('time_update', $fields)) {
-            $result['time_update_view'] = $this->date($result['time_update']);
+        if (isset($data['time_update'])) {
+            $data['time_update_view'] = $this->date($data['time_update']);
         }
 
-        return $result;
+        return $data;
     }
 
     /**
