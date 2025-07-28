@@ -665,6 +665,55 @@ class UtilityService implements ServiceInterface
     }
 
     /**
+     * Canonizes an object or array into a structured associative array using a fixed list of fields.
+     *
+     * This method extracts values for the given fields from either an object (via getter methods)
+     * or an associative array. It also handles special cases like:
+     * - Decoding the `information` field from JSON string to array (if present and non-empty).
+     * - Formatting `time_create` and `time_update` fields into human-readable strings.
+     *
+     * @param mixed $item The item to canonize (object or array).
+     * @param array $fields The list of fields to extract and include in the result.
+     *
+     * @return array The canonized array containing the specified fields and derived fields.
+     */
+    public function canonize(mixed $item, array $fields): array
+    {
+        if (empty($item)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($fields as $field) {
+            $value = null;
+            if (is_object($item)) {
+                $getter = 'get' . str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
+                $value = method_exists($item, $getter) ? $item->$getter() : null;
+            } elseif (is_array($item)) {
+                $value = $item[$field] ?? null;
+            }
+
+            $result[$field] = $value;
+        }
+
+        // Decode `information` field if exists and is not empty
+        if (in_array('information', $fields) && !empty($result['information'])) {
+            $result['information'] = json_decode($result['information'], true);
+        }
+
+        // Format time fields
+        if (in_array('time_create', $fields)) {
+            $result['time_create_view'] = $this->date($result['time_create']);
+        }
+
+        if (in_array('time_update', $fields)) {
+            $result['time_update_view'] = $this->date($result['time_update']);
+        }
+
+        return $result;
+    }
+
+    /**
      * Makes an HTTP request using Laminas HTTP Client and returns the response.
      *
      * @param string     $url     The endpoint URL.
