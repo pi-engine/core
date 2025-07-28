@@ -46,6 +46,7 @@ class ErrorMiddleware implements MiddlewareInterface
                 'error',
                 [
                     'message' => $e->getMessage(),
+                    'key'     => $e->getMessage(),
                     //'trace'   => $e->getTraceAsString(),
                     'code'    => StatusCodeInterface::STATUS_NOT_FOUND,
                 ]
@@ -57,6 +58,7 @@ class ErrorMiddleware implements MiddlewareInterface
                 'error',
                 [
                     'message' => $e->getMessage(),
+                    'key'     => $e->getMessage(),
                     //'trace'   => $e->getTraceAsString(),
                     'code'    => StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR,
                 ]
