@@ -671,8 +671,8 @@ class UtilityService implements ServiceInterface
      * This method extracts fields from an object using getter methods via ClassMethodsHydrator.
      * It also handles custom post-processing for fields like `information` and time formatting.
      *
-     * @param object|array $item The object (preferred) or arrays to canonize.
-     * @param array $fields The list of fields to extract.
+     * @param object|array $item   The object (preferred) or arrays to canonize.
+     * @param array        $fields The list of fields to extract.
      *
      * @return array Canonized data with selected fields and custom formatting.
      */
@@ -684,7 +684,7 @@ class UtilityService implements ServiceInterface
 
         $data = [];
         if (is_object($item)) {
-            $hydrator = new ClassMethodsHydrator();
+            $hydrator  = new ClassMethodsHydrator();
             $extracted = $hydrator->extract($item);
         } elseif (is_array($item)) {
             $extracted = $item;
