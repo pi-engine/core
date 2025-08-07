@@ -59,6 +59,7 @@
     "laminas/laminas-eventmanager": "*",
     "laminas/laminas-cache": "*",
     "laminas/laminas-cache-storage-adapter-redis": "*",
+    "laminas/laminas-cache-storage-adapter-filesystem": "*",
     "laminas/laminas-serializer": "*",
     "laminas/laminas-inputfilter": "*",
     "laminas/laminas-permissions-rbac": "*",
@@ -72,6 +73,7 @@
     "lm-commons/lmc-cors": "*",
     "firebase/php-jwt": "*",
     "symfony/mailer": "*",
+    "symfony/uid": "*",
     "phpmailer/phpmailer": "*",
     "imagine/imagine": "*",
     "phpoffice/phppresentation": "*",
@@ -83,13 +85,19 @@
     "hybridauth/hybridauth": "*",
     "google/auth": "*",
     "google/recaptcha": "*",
+    "google/cloud-storage": "*",
     "phpseclib/phpseclib": "*",
     "mongodb/mongodb": "*",
     "triagens/arangodb": "*",
     "doctrine/doctrine-mongo-odm-module": "*",
     "aws/aws-sdk-php": "*",
     "monolog/monolog": "*",
-    "twilio/sdk": "*"
+    "twilio/sdk": "*",
+    "doctrine/mongodb-odm": "*",
+    "jenssegers/agent": "*",
+    "geoip2/geoip2": "*",
+    "dragonmantank/cron-expression": "*",
+    "basis-company/nats": "*"
   },
   "autoload": {
     "psr-4": {
