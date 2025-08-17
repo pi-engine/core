@@ -57,5 +57,16 @@ return [
                 'admin',
             ],
         ],
+        [
+            'title'      => 'Admin slug update',
+            'module'     => 'core',
+            'section'    => 'admin',
+            'package'    => 'slug',
+            'handler'    => 'update',
+            'permission' => 'admin-core-slug-update',
+            'role'       => [
+                'admin',
+            ],
+        ]
     ],
 ];

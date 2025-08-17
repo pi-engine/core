@@ -14,9 +14,11 @@ return [
     'service_manager' => [
         'aliases'   => [
             Repository\SignatureRepositoryInterface::class => Repository\SignatureRepository::class,
+            Repository\SlugRepositoryInterface::class      => Repository\SlugRepository::class,
         ],
         'factories' => [
             Repository\SignatureRepository::class          => Factory\Repository\SignatureRepositoryFactory::class,
+            Repository\SlugRepository::class               => Factory\Repository\SlugRepositoryFactory::class,
             Security\Account\AccountLoginAttempts::class   => Factory\Security\Account\AccountLoginAttemptsFactory::class,
             Security\Account\AccountLocked::class          => Factory\Security\Account\AccountLockedFactory::class,
             Security\Signature::class                      => Factory\Security\SignatureFactory::class,
@@ -33,6 +35,7 @@ return [
             Service\UtilityService::class                  => Factory\Service\UtilityServiceFactory::class,
             Service\TranslatorService::class               => Factory\Service\TranslatorServiceFactory::class,
             Service\SignatureService::class                => Factory\Service\SignatureServiceFactory::class,
+            Service\SlugService::class                     => Factory\Service\SlugServiceFactory::class,
             Service\CsrfService::class                     => Factory\Service\CsrfServiceFactory::class,
             Service\MessageBrokerService::class            => Factory\Service\MessageBrokerServiceFactory::class,
             Handler\ErrorHandler::class                    => Factory\Handler\ErrorHandlerFactory::class,
@@ -41,6 +44,7 @@ return [
             Handler\Admin\Config\UpdateHandler::class      => Factory\Handler\Admin\Config\UpdateHandlerFactory::class,
             Handler\Admin\Signature\CheckHandler::class    => Factory\Handler\Admin\Signature\CheckHandlerFactory::class,
             Handler\Admin\Signature\UpdateHandler::class   => Factory\Handler\Admin\Signature\UpdateHandlerFactory::class,
+            Handler\Admin\Slug\UpdateHandler::class        => Factory\Handler\Admin\Slug\UpdateHandlerFactory::class,
             Handler\Admin\Module\ListHandler::class        => Factory\Handler\Admin\Module\ListHandlerFactory::class,
         ],
     ],
@@ -154,6 +158,37 @@ return [
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
                                             Handler\Admin\Signature\UpdateHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'slug' => [
+                        'type'         => Literal::class,
+                        'options'      => [
+                            'route'    => '/slug',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'update' => [
+                                'type'    => Literal::class,
+                                'options' => [
+                                    'route'    => '/update',
+                                    'defaults' => [
+                                        'title'      => 'Admin slug update',
+                                        'module'     => 'core',
+                                        'section'    => 'admin',
+                                        'package'    => 'slug',
+                                        'handler'    => 'update',
+                                        'permission' => 'admin-core-slug-update',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\Slug\UpdateHandler::class
                                         ),
                                     ],
                                 ],
