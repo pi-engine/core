@@ -86,54 +86,58 @@ class Injection implements RequestSecurityInterface
     private function detectInjection($input): bool
     {
         $injectionPatterns = [
-            // Basic SQL keywords, scoped to query-like structures
-            '/\b(select|insert|update|delete|drop|create|alter|truncate|exec|execute|grant|revoke|declare)\b\s+[\w\(\*]/i',
+            // Core SQL commands, scoped to real SQL structures
+            '/\bselect\b\s+.*\bfrom\b/i',             // SELECT ... FROM
+            '/\binsert\b\s+into\b/i',                 // INSERT INTO ...
+            '/\bupdate\b\s+\w+\s+set\b/i',            // UPDATE table SET ...
+            '/\bdelete\b\s+from\b/i',                 // DELETE FROM ...
+            '/\bdrop\s+(table|database)\b/i',         // DROP TABLE / DROP DATABASE
+            '/\bcreate\s+(table|database)\b/i',       // CREATE TABLE / DATABASE
+            '/\balter\s+table\b/i',                   // ALTER TABLE
+            '/\btruncate\s+table\b/i',                // TRUNCATE TABLE
+            '/\b(exec|execute|grant|revoke|declare)\b/i', // Dangerous execution keywords
 
-            // SQL comments and operators, scoped to likely SQL contexts
-            '/(--|\#)/', // SQL single-line comment or # as comment
-            '/\/\*.*?\*\//s', // SQL multi-line comment
-            '/\b(or|and)\s+1\s*=\s*1\b/i', // Boolean conditions
-            '/\b(or|and)\s+\'[^\']{1,255}\'\s*=\s*\'[^\']{1,255}\'/i', // String comparisons (limit length to avoid matching long tokens)
-            '/\b(or|and)\s+\"[^\"]{1,255}\"\s*=\s*\"[^\"]{1,255}\"/i', // Double-quoted string comparisons (same limit)
+            // SQL comments and operators
+            '/(--|\#)/',                              // SQL single-line comment
+            '/\/\*.*?\*\//s',                         // SQL multi-line comment
+            '/\b(or|and)\s+1\s*=\s*1\b/i',            // Boolean conditions
+            '/\b(or|and)\s+\'[^\']{1,255}\'\s*=\s*\'[^\']{1,255}\'/i', // String comparisons
+            '/\b(or|and)\s+\"[^\"]{1,255}\"\s*=\s*\"[^\"]{1,255}\"/i', // Double-quoted comparisons
 
-            // SQL functions and expressions, scoped to query-like patterns
-            '/\b(select|insert|update|delete|exec|execute|db_name|user|version|ifnull|sleep|benchmark)\b\s*\(/i', // Functions with opening parentheses
-            '/\binformation_schema\b/i', // Targeting database metadata
-            '/\bcase\s+when\b/i', // Case statements
-            '/\bnull\b/i', // Handling null values
+            // SQL functions and expressions
+            '/\b(select|insert|update|delete|exec|execute|db_name|user|version|ifnull|sleep|benchmark)\b\s*\(/i',
+            '/\binformation_schema\b/i',              // Database metadata
+            '/\bcase\s+when\b/i',                     // CASE WHEN
+            '/\bnull\b/i',                            // NULL values
 
-            // Unions and conditional operations, scoped to query-like structures
-            '/\bunion\b\s+select\b/i', // Union select pattern
-            '/\bunion\s+all\b\s+select\b/i', // Union all select pattern
-            '/\bexists\s*\(\s*select\b/i', // Checking for subquery existence
+            // Unions and subqueries
+            '/\bunion\b\s+select\b/i',                // UNION SELECT
+            '/\bunion\s+all\b\s+select\b/i',          // UNION ALL SELECT
+            '/\bexists\s*\(\s*select\b/i',            // EXISTS (SELECT ...)
 
-            // Other suspicious characters, scoped to SQL contexts
-            '/;/', // Statement terminators
-            '/\bcast\b\s*\(/i', // Cast functions
-            '/\bconvert\b\s*\(/i', // Convert functions
-            '/\bdrop\s+database\b/i', // Dropping databases
-            '/\bshutdown\b/i', // Attempting to shut down the database
-            '/\bwaitfor\s+delay\b/i', // Time delay operations
+            // Suspicious characters in SQL context
+            '/;/',                                    // Statement terminators
+            '/\bcast\b\s*\(/i',                       // CAST(...)
+            '/\bconvert\b\s*\(/i',                    // CONVERT(...)
+            '/\bshutdown\b/i',                        // SHUTDOWN command
+            '/\bwaitfor\s+delay\b/i',                 // WAITFOR DELAY (time-based)
 
-            // Hex or binary injection with limits to avoid false positives
-            '/\b0x[0-9a-fA-F]{2,32}\b/i', // Hexadecimal injection (limit length to reasonable size)
-            '/\bx\'[0-9a-fA-F]{2,32}\'/i', // Hex-encoded strings (limit length)
+            // Hex or binary injection
+            '/\b0x[0-9a-fA-F]{2,32}\b/i',             // Hexadecimal injection
+            '/\bx\'[0-9a-fA-F]{2,32}\'/i',            // Hex-encoded strings
 
-            // Miscellaneous suspicious patterns, scoped more contextually
-            '/\b(select.*from|union.*select|insert.*into|update.*set|delete\s+from|drop\s+table|create\s+table|alter\s+table|truncate\s+table)\b/i',
-
-            // Catching numeric or chained conditions in SQL injection
-            '/\b(or|and)\s+\d{1,255}\s*=\s*\d{1,255}/i', // Numeric equality checks (limit length)
-            '/\b(?:like|regexp)\b/i', // Check for pattern matching (like or regexp)
-            '/\b(if|case)\s*\(/i', // If/Case conditions
+            // Miscellaneous suspicious patterns
+            '/\b(select.*from|union.*select|insert.*into|update.*set|delete\s+from)\b/i',
+            '/\b(or|and)\s+\d{1,255}\s*=\s*\d{1,255}/i', // Numeric equality
+            '/\b(?:like|regexp)\b/i',                 // LIKE / REGEXP
+            '/\b(if|case)\s*\(/i',                    // IF(...) or CASE(...)
             '/\s*;\s*(select|insert|update|delete|drop|create|alter|truncate)\s+/i', // Chained queries
 
-            // Handling encoded input, expanded to cover more encoding variants
-            '/(?:%27|%22|%3D|%3B|%23|%2D|%2F|%5C|%25|%2C|%5B|%5D|%7B|%7D)/i', // URL encoded equivalents of ', ", =, ;, #, -, /, \, %, [, ], {, }
+            // URL encoded injection attempts
+            '/(?:%27|%22|%3D|%3B|%23|%2D|%2F|%5C|%25|%2C|%5B|%5D|%7B|%7D)/i',
 
-            // Additional defensive patterns to detect obfuscated payloads
-            '/\b(select|insert|update|delete)\b.*\bfrom\b/i', // Checking if SELECT/INSERT/UPDATE/DELETE are combined with FROM clause
-            '/\bselect\b\s*\*\s*\bfrom\b\s*\binformation_schema\b/i', // Specific check for SQL injection targeting information_schema
+            // Obfuscated payloads
+            '/\bselect\b\s*\*\s*\bfrom\b\s*\binformation_schema\b/i', // SELECT * FROM information_schema
         ];
 
         // If input is an array, recursively check each item
