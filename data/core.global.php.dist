@@ -45,7 +45,7 @@ return [
         'date_type'     => IntlDateFormatter::SHORT,
         'time_type'     => IntlDateFormatter::NONE,
         'date_calendar' => IntlDateFormatter::TRADITIONAL,
-        'date_pattern'  => 'dd/MM/yyyy',
+        'date_pattern'  => 'yyyy/MM/dd',
     ],
     'security'     => [
         // General
