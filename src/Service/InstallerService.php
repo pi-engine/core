@@ -8,11 +8,18 @@ use Pi\User\Service\PermissionService;
 
 class InstallerService implements ServiceInterface
 {
+    /** @var ModuleService */
+    protected ModuleService $moduleService;
+
     /** @var PermissionService */
     protected PermissionService $permissionService;
 
-    public function __construct(PermissionService $permissionService)
+    public function __construct(
+        ModuleService $moduleService,
+        PermissionService $permissionService
+    )
     {
+        $this->moduleService = $moduleService;
         $this->permissionService = $permissionService;
     }
 
@@ -104,7 +111,12 @@ class InstallerService implements ServiceInterface
         }
     }
 
-    public function canonizePermission(array $permissionConfig): array
+    public function installOrUpdateDatabase(): array
+    {
+        return $this->moduleService->installOrUpdateDatabase();
+    }
+
+    private function canonizePermission(array $permissionConfig): array
     {
         foreach ($permissionConfig as $permissionSection => $permissionList) {
             foreach ($permissionList as $permissionSingleKey => $permissionSingle) {

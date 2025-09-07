@@ -6,6 +6,7 @@ namespace Pi\Core\Factory\Service;
 
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Service\InstallerService;
+use Pi\Core\Service\ModuleService;
 use Pi\User\Service\PermissionService;
 use Psr\Container\ContainerInterface;
 
@@ -21,6 +22,7 @@ class InstallerServiceFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null): InstallerService
     {
         return new InstallerService(
+            $container->get(ModuleService::class),
             $container->get(PermissionService::class)
         );
     }

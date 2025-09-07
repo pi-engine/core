@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Pi\Core\Factory\Handler\Admin\Module;
 
-use Laminas\ModuleManager\ModuleManager;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Pi\Core\Handler\Admin\Module\ListHandler;
+use Pi\Core\Service\ModuleService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -29,7 +29,7 @@ class ListHandlerFactory implements FactoryInterface
         return new ListHandler(
             $container->get(ResponseFactoryInterface::class),
             $container->get(StreamFactoryInterface::class),
-            $container->get(ModuleManager::class)
+            $container->get(ModuleService::class)
         );
     }
 }

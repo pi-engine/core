@@ -36,13 +36,15 @@ class InstallerHandler implements RequestHandlerInterface
     {
         $permissionFile = include realpath(__DIR__ . '/../../config/module.permission.php');
 
+        //$result = $this->installerService->installOrUpdateDatabase();
+
         $this->installerService->installPermission('core', $permissionFile);
 
         // Set result
         return new EscapingJsonResponse(
             [
                 'result' => true,
-                'data'   => new stdClass(),
+                'data'   => [],
                 'error'  => new stdClass(),
             ],
         );
