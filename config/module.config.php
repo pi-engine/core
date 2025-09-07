@@ -13,10 +13,12 @@ use Pi\User\Middleware\AuthorizationMiddleware;
 return [
     'service_manager' => [
         'aliases'   => [
+            Repository\ModuleRepositoryInterface::class    => Repository\ModuleRepository::class,
             Repository\SignatureRepositoryInterface::class => Repository\SignatureRepository::class,
             Repository\SlugRepositoryInterface::class      => Repository\SlugRepository::class,
         ],
         'factories' => [
+            Repository\ModuleRepository::class             => Factory\Repository\ModuleRepositoryFactory::class,
             Repository\SignatureRepository::class          => Factory\Repository\SignatureRepositoryFactory::class,
             Repository\SlugRepository::class               => Factory\Repository\SlugRepositoryFactory::class,
             Security\Account\AccountLoginAttempts::class   => Factory\Security\Account\AccountLoginAttemptsFactory::class,
@@ -38,6 +40,7 @@ return [
             Service\SlugService::class                     => Factory\Service\SlugServiceFactory::class,
             Service\CsrfService::class                     => Factory\Service\CsrfServiceFactory::class,
             Service\MessageBrokerService::class            => Factory\Service\MessageBrokerServiceFactory::class,
+            Service\ModuleService::class                   => Factory\Service\ModuleServiceFactory::class,
             Handler\ErrorHandler::class                    => Factory\Handler\ErrorHandlerFactory::class,
             Handler\InstallerHandler::class                => Factory\Handler\InstallerHandlerFactory::class,
             Handler\Admin\Config\ListHandler::class        => Factory\Handler\Admin\Config\ListHandlerFactory::class,
@@ -164,7 +167,7 @@ return [
                             ],
                         ],
                     ],
-                    'slug' => [
+                    'slug'      => [
                         'type'         => Literal::class,
                         'options'      => [
                             'route'    => '/slug',
