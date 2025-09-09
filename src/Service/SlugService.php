@@ -38,7 +38,7 @@ class SlugService implements ServiceInterface
                 $updateParams['limit'] = $params['limit'];
             }
 
-            $tables = (array) $params['table'];
+            $tables = (array)$params['table'];
             foreach ($tables as $table) {
                 $this->slugRepositoryInterface->updateAllSlugs($table, $updateParams);
             }

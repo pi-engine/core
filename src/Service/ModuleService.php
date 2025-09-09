@@ -83,7 +83,7 @@ class ModuleService implements ServiceInterface
     public function installOrUpdateDatabase(): array
     {
         $result = [];
-        
+
         // 1. Collect all schema.sql and schema-update.sql paths from modules
         $schemasInstallPath = [];
         $schemasUpdatePath  = [];
@@ -111,7 +111,7 @@ class ModuleService implements ServiceInterface
 
         // 3. Add all new tables
         $result['table'] = $this->moduleRepository->createTables($installStatements);
-        
+
         // 4. Extract Update SQL statements
         $updateStatements = [];
         foreach ($schemasUpdatePath as $schemaUpdatePath) {
@@ -124,7 +124,7 @@ class ModuleService implements ServiceInterface
 
         // 5. Update all new changes
         $result['update'] = $this->moduleRepository->updateTables($updateStatements);
-        
+
         return $result;
     }
 

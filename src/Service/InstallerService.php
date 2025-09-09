@@ -15,11 +15,10 @@ class InstallerService implements ServiceInterface
     protected PermissionService $permissionService;
 
     public function __construct(
-        ModuleService $moduleService,
+        ModuleService     $moduleService,
         PermissionService $permissionService
-    )
-    {
-        $this->moduleService = $moduleService;
+    ) {
+        $this->moduleService     = $moduleService;
         $this->permissionService = $permissionService;
     }
 
