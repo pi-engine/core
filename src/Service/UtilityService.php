@@ -610,6 +610,7 @@ class UtilityService implements ServiceInterface
      * @param array $params    The input data containing updated values.
      * @param array $existing  The existing record to be updated.
      * @param array $fieldList The list of allowed fields.
+     * @param bool $clean If true, removes params not in field list. Default: false.
      *
      * @return array The updated record with all required fields.
      *
@@ -628,8 +629,7 @@ class UtilityService implements ServiceInterface
      * // ]
      * ```
      */
-    // ToDo: use this function in project
-    public function updateFields(array $params, array $existing, array $fieldList): array
+    public function updateFields(array $params, array $existing, array $fieldList, bool $clean = false): array
     {
         // If no specific field list is provided, merge all input fields into the existing data
         if (empty($fieldList)) {
@@ -637,7 +637,7 @@ class UtilityService implements ServiceInterface
         }
 
         // Ensure all fields exist in the existing array
-        $existing = $this->ensureFields($existing, $fieldList);
+        $existing = $this->ensureFields($existing, $fieldList, $clean);
 
         // Update existing values with new data
         foreach ($params as $key => $value) {
