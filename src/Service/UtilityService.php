@@ -559,38 +559,45 @@ class UtilityService implements ServiceInterface
     /**
      * Ensures the input array contains all fields from the allowed list.
      * Any missing fields will be added with a null value.
-     * If the field list is empty, all input fields are accepted without modification.
+     * Optionally removes fields not in the allowed list.
      *
      * @param array $params    The input array to be validated.
      * @param array $fieldList The list of fields to ensure in the input array.
+     * @param bool  $clean     If true, removes params not in field list. Default: false.
      *
-     * @return array The modified array containing all fields from the list.
+     * @return array The modified array containing only fields from the list.
      *
      * Example:
      * ```php
-     * $params = ['first_name' => 'John'];
+     * $params = ['first_name' => 'John', 'age' => 30];
      * $fieldList = ['first_name', 'last_name', 'email'];
      *
-     * $result = $this->ensureFields($params, $fieldList);
-     * // Result: [
-     * // 'first_name' => 'John',
-     * // 'last_name' => null,
-     * // 'email' => null
+     * $result = $this->ensureFields($params, $fieldList, true);
+     * // Result:
+     * // [
+     * //   'first_name' => 'John',
+     * //   'last_name' => null,
+     * //   'email' => null
      * // ]
      * ```
      */
-    // ToDo: use this function in project
-    public function ensureFields(array $params, array $fieldList): array
+    public function ensureFields(array $params, array $fieldList, bool $clean = false): array
     {
         // If no specific field list is provided, return the input as-is
         if (empty($fieldList)) {
             return $params;
         }
 
+        // Add missing fields with null
         foreach ($fieldList as $field) {
             if (!array_key_exists($field, $params)) {
                 $params[$field] = null;
             }
+        }
+
+        // Optionally remove fields not in fieldList
+        if ($clean) {
+            $params = array_intersect_key($params, array_flip($fieldList));
         }
 
         return $params;
