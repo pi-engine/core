@@ -108,7 +108,7 @@ class Injection implements RequestSecurityInterface
 
         // Check for SQL injection patterns in strings
         $input    = urldecode($input);
-        $patterns = $this->getPatterns($this->config['injection']['pattern_type'] ?? 'standard');
+        $patterns = $this->getPatterns($this->config['injection']['pattern_type'] ?? 'critical');
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $input)) {
                 return true;

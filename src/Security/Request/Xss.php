@@ -107,7 +107,7 @@ class Xss implements RequestSecurityInterface
         }
 
         // Check for XSS patterns in strings
-        $patterns = $this->getPatterns($this->config['xss']['pattern_type'] ?? 'standard');
+        $patterns = $this->getPatterns($this->config['xss']['pattern_type'] ?? 'critical');
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $input)) {
                 return true;
