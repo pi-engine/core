@@ -29,6 +29,9 @@ use function ucfirst;
 
 class UtilityService implements ServiceInterface
 {
+    /* @var int */
+    protected int $timeout = 300;
+
     /* @var array */
     protected array $config;
 
@@ -736,6 +739,8 @@ class UtilityService implements ServiceInterface
      */
     public function callService(string $url, string $method, array $headers = [], ?array $body = null): array
     {
+        ini_set('max_execution_time', $this->timeout);
+
         // Check HTTP method
         $validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'];
         if (!in_array(strtoupper($method), $validMethods, true)) {
@@ -769,7 +774,7 @@ class UtilityService implements ServiceInterface
             'curloptions' => [
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_TIMEOUT        => 180,
+                CURLOPT_TIMEOUT        => $this->timeout,
                 CURLOPT_CONNECTTIMEOUT => 10,
             ],
         ];
