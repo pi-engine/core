@@ -836,7 +836,7 @@ class UtilityService implements ServiceInterface
                 'result' => false,
                 'data'   => [],
                 'error'  => [
-                    'message'  => 'Request timed out',
+                    'message'  => "Request timed out, {$url}",
                     'key'      => 'request-timed-out',
                     'response' => $e->getMessage(),
                 ],
