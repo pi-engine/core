@@ -739,8 +739,6 @@ class UtilityService implements ServiceInterface
      */
     public function callService(string $url, string $method, array $headers = [], ?array $body = null): array
     {
-        ini_set('max_execution_time', $this->timeout);
-
         // Check HTTP method
         $validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'];
         if (!in_array(strtoupper($method), $validMethods, true)) {
@@ -836,7 +834,7 @@ class UtilityService implements ServiceInterface
                 'result' => false,
                 'data'   => [],
                 'error'  => [
-                    'message'  => "Request timed out, {$url}",
+                    'message'  => "Request timed out: {$url}",
                     'key'      => 'request-timed-out',
                     'response' => $e->getMessage(),
                 ],
