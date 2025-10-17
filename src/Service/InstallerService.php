@@ -28,6 +28,7 @@ class InstallerService implements ServiceInterface
         $permissionConfig = $this->canonizePermission($permissionConfig);
 
         // Get list of exist pages and permission
+        $this->permissionService->cleanInstallerList(['module' => $module]);
         $installerList = $this->permissionService->getInstallerList(['module' => $module]);
 
         // Set list
