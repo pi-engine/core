@@ -45,6 +45,7 @@ class Ip implements RequestSecurityInterface
         // Set ip class
         $ipUtility = new IpUtility();
         $clientIp  = $ipUtility->getClientIp();
+        $ipType    = $ipUtility->getIpType($clientIp);
 
         // Check ip is not lock
         if ($this->isIpLocked($clientIp)) {
@@ -52,7 +53,13 @@ class Ip implements RequestSecurityInterface
                 'result' => false,
                 'name'   => $this->name,
                 'status' => 'unsuccessful',
-                'data'   => [],
+                'data'   => [
+                    'client_ip'      => $clientIp,
+                    'ip_type'        => $ipType,
+                    'is_locked'      => true,
+                    'in_whitelist'   => false,
+                    'in_blacklisted' => false,
+                ],
             ];
         }
 
@@ -63,8 +70,11 @@ class Ip implements RequestSecurityInterface
                 'name'   => $this->name,
                 'status' => 'successful',
                 'data'   => [
-                    'client_ip'    => $clientIp,
-                    'in_whitelist' => true,
+                    'client_ip'      => $clientIp,
+                    'ip_type'        => $ipType,
+                    'is_locked'      => false,
+                    'in_whitelist'   => true,
+                    'in_blacklisted' => false,
                 ],
             ];
         }
@@ -76,6 +86,10 @@ class Ip implements RequestSecurityInterface
                 'name'   => $this->name,
                 'status' => 'unsuccessful',
                 'data'   => [
+                    'client_ip'      => $clientIp,
+                    'ip_type'        => $ipType,
+                    'is_locked'      => false,
+                    'in_whitelist'   => false,
                     'in_blacklisted' => true,
                 ],
             ];
@@ -86,8 +100,11 @@ class Ip implements RequestSecurityInterface
             'name'   => $this->name,
             'status' => 'successful',
             'data'   => [
-                'client_ip'    => $clientIp,
-                'in_whitelist' => false,
+                'client_ip'      => $clientIp,
+                'ip_type'        => $ipType,
+                'is_locked'      => false,
+                'in_whitelist'   => false,
+                'in_blacklisted' => false,
             ],
         ];
     }

@@ -117,6 +117,39 @@ class Ip implements ServiceInterface
     }
 
     /**
+     * Check if the given IP address is local or private.
+     *
+     * @param string $ip The IP address to check.
+     *
+     * @return bool True if the IP is local/private, false otherwise.
+     */
+    public function isLocalIp(string $ip): bool
+    {
+        // Check against known local/private ranges
+        foreach (self::$localIpRanges as $range) {
+            if (str_starts_with($ip, $range)) {
+                return true;
+            }
+        }
+
+        // Check if IP is a private or reserved IP
+        return filter_var($ip, FILTER_VALIDATE_IP) !== false
+               && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+    }
+
+    /**
+     * Determine if the given IP is local or public.
+     *
+     * @param string $ip The IP address to check.
+     *
+     * @return string Returns 'local' if the IP is local/private, 'public' if it's public.
+     */
+    public function getIpType(string $ip): string
+    {
+        return $this->isLocalIp($ip) ? 'local' : 'public';
+    }
+
+    /**
      * Validate if a given IP is in the correct format.
      *
      * @param string $ip The IP address to validate.

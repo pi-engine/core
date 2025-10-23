@@ -12,6 +12,7 @@ use Pi\Core\Security\Request\InputValidation as RequestSecurityInputValidation;
 use Pi\Core\Security\Request\Ip as RequestSecurityIp;
 use Pi\Core\Security\Request\Method as RequestSecurityMethod;
 use Pi\Core\Security\Request\RequestLimit as RequestSecurityRequestLimit;
+use Pi\Core\Security\Request\Url as RequestSecurityUrl;
 use Pi\Core\Security\Request\UserData as RequestUserData;
 use Pi\Core\Security\Request\Xss as RequestSecurityXss;
 use Pi\Core\Security\Response\Compress as ResponseCompress;
@@ -108,6 +109,9 @@ class SecurityMiddleware implements MiddlewareInterface
         $list = [];
         if (isset($this->config['ip']['is_active']) && $this->config['ip']['is_active']) {
             $list['ip'] = new RequestSecurityIp($this->cacheService, $this->utilityService, $this->config);
+        }
+        if (isset($this->config['url']['is_active']) && $this->config['url']['is_active']) {
+            $list['url'] = new RequestSecurityUrl($this->config);
         }
         if (isset($this->config['userData']['is_active']) && $this->config['userData']['is_active']) {
             $list['userData'] = new RequestUserData($this->cacheService, $this->utilityService, $this->config);

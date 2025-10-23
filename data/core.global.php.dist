@@ -73,6 +73,10 @@ return [
                 '198.51.100.0/24', // Range
             ],
         ],
+        'url'            => [
+            'is_active' => true,
+            'blacklist' => [],
+        ],
         'method'         => [
             'is_active'    => true,
             'allow_method' => ['POST', 'GET'],
