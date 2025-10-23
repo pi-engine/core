@@ -399,6 +399,24 @@ class UtilityService implements ServiceInterface
     }
 
     /**
+     * Check if URL is allowed
+     *
+     * @param string $url
+     * @param array  $allowedUrls
+     *
+     * @return bool
+     */
+    public function isUrlAllowed(string $url, array $allowedUrls): bool
+    {
+        foreach ($allowedUrls as $allowed) {
+            if (str_starts_with($url, $allowed)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get the real client IP address, preferring IPv4 over IPv6 if both exist.
      *
      * This function checks various headers used by proxies, cloud services, and load balancers.
