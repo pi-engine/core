@@ -426,8 +426,8 @@ class UtilityService implements ServiceInterface
      */
     public function getClientIp(): string
     {
-        $ip = new Ip();
-        return $ip->getClientIp();
+        $ipUtility = new Ip();
+        return $ipUtility->getClientIp();
     }
 
     /**
@@ -440,36 +440,8 @@ class UtilityService implements ServiceInterface
      */
     public function isIpAllowed(string $ip, array $allowedIps): bool
     {
-        foreach ($allowedIps as $allowedIp) {
-            if (str_contains($allowedIp, '/')) {
-                // CIDR range check
-                if ($this->isIpInRange($ip, $allowedIp)) {
-                    return true;
-                }
-            } elseif ($ip === $allowedIp) {
-                // Exact match
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if an IP falls within a CIDR subnet.
-     *
-     * @param string $ip   The IP to check.
-     * @param string $cidr The CIDR subnet (e.g., "192.168.1.0/24").
-     *
-     * @return bool True if IP is within the subnet, otherwise false.
-     */
-    private function isIpInRange(string $ip, string $cidr): bool
-    {
-        [$subnet, $mask] = explode('/', $cidr);
-        $ipBinary     = ip2long($ip);
-        $subnetBinary = ip2long($subnet);
-        $maskBinary   = -1 << (32 - $mask);
-
-        return ($ipBinary & $maskBinary) === ($subnetBinary & $maskBinary);
+        $ipUtility = new Ip();
+        return $ipUtility->isIpAllowed($ip, $allowedIps);
     }
 
     /**

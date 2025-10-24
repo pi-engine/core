@@ -372,6 +372,52 @@ class Ip implements ServiceInterface
     }
 
     /**
+     * Check if two IPs are the same (IPv4 or IPv6)
+     *
+     * @param string $ip1 First IP address
+     * @param string $ip2 Second IP address
+     * @return bool True if both IPs are identical, false otherwise
+     */
+    function areIpsEqual(string $ip1, string $ip2): bool
+    {
+        // Convert IPs to binary format
+        $ip1Normalized = @inet_pton($ip1);
+        $ip2Normalized = @inet_pton($ip2);
+
+        // If either IP is invalid, consider them different
+        if ($ip1Normalized === false || $ip2Normalized === false) {
+            return false;
+        }
+
+        // Compare
+        return $ip1Normalized === $ip2Normalized;
+    }
+
+    /**
+     * Check if an IP is in the allowed list (supports CIDR ranges)
+     *
+     * @param string $ip         The IP to check.
+     * @param array  $allowedIps List of allowed IPs and CIDR subnets.
+     *
+     * @return bool True if allowed, otherwise false.
+     */
+    public function isIpAllowed(string $ip, array $allowedIps): bool
+    {
+        foreach ($allowedIps as $allowedIp) {
+            if (str_contains($allowedIp, '/')) {
+                // CIDR range check
+                if ($this->isIpInRange($ip, $allowedIp)) {
+                    return true;
+                }
+            } elseif ($ip === $allowedIp) {
+                // Exact match
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Sanitizes the cache key to ensure it meets the allowed format.
      *
      * @param string $key The original key
