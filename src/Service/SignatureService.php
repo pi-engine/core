@@ -32,6 +32,11 @@ class SignatureService implements ServiceInterface
         $this->config                       = $config;
     }
 
+    public function checkSignature($table, $params): bool
+    {
+        return $this->signatureRepositoryInterface->checkSignature($table, $params);
+    }
+
     public function checkAllSignatures($params): array
     {
         $result = [];
