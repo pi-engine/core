@@ -25,7 +25,10 @@ class UtilityServiceFactory implements FactoryInterface
     {
         // Get config
         $config = $container->get('config');
-        $config = $config['utility'] ?? [];
+        $config = array_merge(
+            $config['utility'] ?? [],
+            $config['security'] ?? [],
+        );
 
         return new UtilityService($config);
     }

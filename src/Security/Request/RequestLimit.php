@@ -57,7 +57,7 @@ class RequestLimit implements RequestSecurityInterface
         }
 
         // Set ip class
-        $ipUtility = new IpUtility();
+        $ipUtility = new IpUtility($this->config['ip']);
         $clientIp  = $ipUtility->getClientIp();
 
         // Set key

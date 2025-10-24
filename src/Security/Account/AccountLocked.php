@@ -83,7 +83,7 @@ class AccountLocked implements AccountSecurityInterface
 
             case 'ip':
                 if (!isset($params['user_ip']) || empty($params['user_ip'])) {
-                    $ipUtility         = new IpUtility();
+                    $ipUtility         = new IpUtility($this->config['ip']);
                     $params['user_ip'] = $ipUtility->getClientIp();
                 }
 

@@ -11,18 +11,17 @@ use Pi\Core\Service\ServiceInterface;
 
 class Ip implements ServiceInterface
 {
-    private static array $localIpRanges
-        = [
-            '127.0.0.1', '::1', '192.168.', '10.',
-            '172.16.', '172.17.', '172.18.', '172.19.', '172.20.', '172.21.', '172.22.', '172.23.',
-            '172.24.', '172.25.', '172.26.', '172.27.', '172.28.', '172.29.', '172.30.', '172.31.',
-        ];
-
     /* @var CacheService|null */
     private ?CacheService $cacheService;
 
-    public function __construct(CacheService $cacheService = null)
-    {
+    /* @var array */
+    private array $config;
+
+    public function __construct(
+        $config,
+        CacheService $cacheService = null,
+    ) {
+        $this->config       = $config;
         $this->cacheService = $cacheService;
     }
 
@@ -31,37 +30,53 @@ class Ip implements ServiceInterface
      *
      * @return string Client IP address
      */
+    /**
+     * Get the real client IP address, considering proxies.
+     *
+     * Prioritizes public IPv4, then public IPv6, then internal/local fallback.
+     *
+     * @return string The most likely client IP address.
+     */
     public function getClientIp(): string
     {
         $ipCandidates = $this->extractIpFromHeaders();
 
-        // Check remote address as last fallback
-        if (!empty($_SERVER['REMOTE_ADDR']) && $this->isValidIp($_SERVER['REMOTE_ADDR'])) {
-            $ipCandidates[] = $_SERVER['REMOTE_ADDR'];
+        // Include REMOTE_ADDR as a fallback
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+        if (!empty($remoteAddr) && $this->isValidIp($remoteAddr)) {
+            $ipCandidates[] = $remoteAddr;
         }
 
-        // Remove duplicates
-        $ipCandidates = array_unique($ipCandidates);
+        // Remove duplicates and invalid IPs
+        $ipCandidates = array_filter(array_unique($ipCandidates), fn($ip) => $this->isValidIp($ip));
 
-        // Determine if running in CLI or local
-        $isLocal = php_sapi_name() === 'cli' || (!$this->isPublicIp($_SERVER['REMOTE_ADDR'] ?? ''));
+        // Detect CLI or local environment
+        $isCliOrLocal = php_sapi_name() === 'cli' || $this->getIpType($remoteAddr) === 'local';
 
-        // Prioritize first public IPv4
+        // Try to find first public IPv4
         foreach ($ipCandidates as $ip) {
-            if ($this->isPublicIp($ip) && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            if ($this->getIpType($ip) === 'public' && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 return $ip;
             }
         }
 
-        // If no public IPv4 found, return first public IPv6
+        // Fallback to first public IPv6
         foreach ($ipCandidates as $ip) {
-            if ($this->isPublicIp($ip)) {
+            if ($this->getIpType($ip) === 'public') {
+                return $ip;
+            }
+        }
+
+        // Fallback to internal or local IP
+        foreach ($ipCandidates as $ip) {
+            $type = $this->getIpType($ip);
+            if ($type === 'internal' || $type === 'local') {
                 return $ip;
             }
         }
 
         // Default fallback
-        return $isLocal ? '127.0.0.1' : '0.0.0.0';
+        return $isCliOrLocal ? '127.0.0.1' : '0.0.0.0';
     }
 
     /**
@@ -100,23 +115,6 @@ class Ip implements ServiceInterface
     }
 
     /**
-     * Check if the given IP address is public.
-     *
-     * @param string $ip The IP address to check.
-     *
-     * @return bool True if the IP is public, false otherwise.
-     */
-    public function isPublicIp(string $ip): bool
-    {
-        foreach (self::$localIpRanges as $range) {
-            if (str_starts_with($ip, $range)) {
-                return false;
-            }
-        }
-        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
-    }
-
-    /**
      * Check if the given IP address is local or private.
      *
      * @param string $ip The IP address to check.
@@ -126,27 +124,53 @@ class Ip implements ServiceInterface
     public function isLocalIp(string $ip): bool
     {
         // Check against known local/private ranges
-        foreach (self::$localIpRanges as $range) {
+        foreach ($this->config['local_ranges'] as $range) {
             if (str_starts_with($ip, $range)) {
                 return true;
             }
         }
 
         // Check if IP is a private or reserved IP
-        return filter_var($ip, FILTER_VALIDATE_IP) !== false
-               && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
     }
 
     /**
-     * Determine if the given IP is local or public.
+     * Check if the given IP address is considered internal.
      *
      * @param string $ip The IP address to check.
      *
-     * @return string Returns 'local' if the IP is local/private, 'public' if it's public.
+     * @return bool True if the IP is internal, false otherwise.
+     */
+    public function isInternalIp(string $ip): bool
+    {
+        foreach ($this->config['internal_ranges'] as $range) {
+            if (str_starts_with($ip, $range)) {
+                return true;
+            }
+        }
+
+        // Check if IP is a private or reserved IP
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+    }
+
+    /**
+     * Determine if the given IP is local, internal, or public.
+     *
+     * @param string $ip The IP address to check.
+     *
+     * @return string Returns one of: 'local', 'internal', or 'public'.
      */
     public function getIpType(string $ip): string
     {
-        return $this->isLocalIp($ip) ? 'local' : 'public';
+        if ($this->isLocalIp($ip)) {
+            return 'local';
+        }
+
+        if ($this->isInternalIp($ip)) {
+            return 'internal';
+        }
+
+        return 'public';
     }
 
     /**
@@ -219,7 +243,7 @@ class Ip implements ServiceInterface
             ];
         }
 
-        if (!$this->isPublicIp($ip)) {
+        if ($this->getIpType($ip) !== 'public') {
             return [
                 'result' => true,
                 'data'   => [
@@ -376,6 +400,7 @@ class Ip implements ServiceInterface
      *
      * @param string $ip1 First IP address
      * @param string $ip2 Second IP address
+     *
      * @return bool True if both IPs are identical, false otherwise
      */
     function areIpsEqual(string $ip1, string $ip2): bool

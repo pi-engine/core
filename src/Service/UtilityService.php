@@ -18,7 +18,7 @@ use Laminas\Http\Client\Adapter\Exception\RuntimeException;
 use Laminas\Http\Client\Adapter\Exception\TimeoutException;
 use Laminas\Hydrator\ClassMethodsHydrator;
 use NumberFormatter;
-use Pi\Core\Service\Utility\Ip;
+use Pi\Core\Service\Utility\Ip as IpUtility;
 use Symfony\Component\Uid\Uuid;
 use function class_exists;
 use function method_exists;
@@ -399,24 +399,6 @@ class UtilityService implements ServiceInterface
     }
 
     /**
-     * Check if URL is allowed
-     *
-     * @param string $url
-     * @param array  $allowedUrls
-     *
-     * @return bool
-     */
-    public function isUrlAllowed(string $url, array $allowedUrls): bool
-    {
-        foreach ($allowedUrls as $allowed) {
-            if (str_starts_with($url, $allowed)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Get the real client IP address, preferring IPv4 over IPv6 if both exist.
      *
      * This function checks various headers used by proxies, cloud services, and load balancers.
@@ -426,22 +408,8 @@ class UtilityService implements ServiceInterface
      */
     public function getClientIp(): string
     {
-        $ipUtility = new Ip();
+        $ipUtility = new IpUtility($this->config['ip']);
         return $ipUtility->getClientIp();
-    }
-
-    /**
-     * Check if an IP is in the allowed list (supports CIDR ranges)
-     *
-     * @param string $ip         The IP to check.
-     * @param array  $allowedIps List of allowed IPs and CIDR subnets.
-     *
-     * @return bool True if allowed, otherwise false.
-     */
-    public function isIpAllowed(string $ip, array $allowedIps): bool
-    {
-        $ipUtility = new Ip();
-        return $ipUtility->isIpAllowed($ip, $allowedIps);
     }
 
     /**

@@ -91,7 +91,7 @@ class ErrorHandler implements RequestHandlerInterface
         }
 
         // Set ip class
-        $ipUtility = new IpUtility();
+        $ipUtility = new IpUtility([]);
         $clientIp  = $ipUtility->getClientIp();
 
         // Set log params

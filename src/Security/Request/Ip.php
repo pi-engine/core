@@ -43,7 +43,7 @@ class Ip implements RequestSecurityInterface
     public function check(ServerRequestInterface $request, array $securityStream = []): array
     {
         // Set ip class
-        $ipUtility = new IpUtility();
+        $ipUtility = new IpUtility($this->config['ip']);
         $clientIp  = $ipUtility->getClientIp();
         $ipType    = $ipUtility->getIpType($clientIp);
 

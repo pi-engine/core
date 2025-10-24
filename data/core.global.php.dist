@@ -77,6 +77,10 @@ return [
             'is_active' => true,
             'blacklist' => [],
         ],
+        'origin'         => [
+            'is_active' => true,
+            'blacklist' => [],
+        ],
         'method'         => [
             'is_active'    => true,
             'allow_method' => ['POST', 'GET'],

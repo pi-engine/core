@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pi\Core\Security\Request;
 
 use Fig\Http\Message\StatusCodeInterface;
+use Pi\Core\Service\Utility\Url as UrlUtility;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Url implements RequestSecurityInterface
@@ -13,7 +14,7 @@ class Url implements RequestSecurityInterface
     protected array $config;
 
     /* @var string */
-    protected string $name = 'ip';
+    protected string $name = 'url';
 
     public function __construct($config)
     {
@@ -22,17 +23,21 @@ class Url implements RequestSecurityInterface
 
     public function check(ServerRequestInterface $request, array $securityStream = []): array
     {
-        $currentUrl = $this->getCallerUrl($request);
+        $urlUtility = new UrlUtility();
+        $clientUrl  = $urlUtility->getCallerUrl($request, $securityStream);
+        $clientType = $urlUtility->getCallerUrlType($clientUrl, $securityStream, $this->config['url']['internal_urls']);
+
 
         // Check block list first
-        if (!empty($currentUrl)) {
-            if ($this->isBlacklisted($currentUrl, $this->config['url']['blacklist'])) {
+        if (!empty($clientUrl)) {
+            if ($this->isBlacklisted($clientUrl, $this->config['url']['blacklist'])) {
                 return [
                     'result' => false,
                     'name'   => $this->name,
                     'status' => 'unsuccessful',
                     'data'   => [
-                        'client_url'     => $currentUrl,
+                        'client_url'     => $clientUrl,
+                        'client_type'    => $clientType,
                         'in_blacklisted' => true,
                     ],
                 ];
@@ -44,82 +49,20 @@ class Url implements RequestSecurityInterface
             'name'   => $this->name,
             'status' => 'successful',
             'data'   => [
-                'client_url'     => $currentUrl,
+                'client_url'     => $clientUrl,
+                'client_type'    => $clientType,
                 'in_blacklisted' => false,
             ],
         ];
     }
 
     /**
-     * Detect and return the URL (origin) of the caller making the request.
-     * Tries custom headers first, then standard browser headers,
-     * and finally falls back to the client IP address.
-     */
-    public function getCallerUrl(ServerRequestInterface $request): string
-    {
-        // Custom header for backend or microservice requests
-        $clientOrigin = $request->getHeaderLine('X-Client-Origin');
-        if (!empty($clientOrigin)) {
-            return $this->normalizeUrl($clientOrigin);
-        }
-
-        // Browser-originated request
-        $origin = $request->getHeaderLine('Origin');
-        if (!empty($origin)) {
-            return $this->normalizeUrl($origin);
-        }
-
-        // Fallback to Referer (older browsers or redirects)
-        $referer = $request->getHeaderLine('Referer');
-        if (!empty($referer)) {
-            // Strip down to scheme + host
-            $parts = parse_url($referer);
-            if (!empty($parts['scheme']) && !empty($parts['host'])) {
-                $url = $parts['scheme'] . '://' . $parts['host'];
-                if (!empty($parts['port'])) {
-                    $url .= ':' . $parts['port'];
-                }
-                return $this->normalizeUrl($url);
-            }
-        }
-
-        // Final fallback — client IP (for internal services or CLI)
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        return 'ip://' . $ip;
-    }
-
-    /**
-     * Normalize and sanitize a URL (ensure consistent trailing slash and lowercase host)
-     */
-    private function normalizeUrl(string $url): string
-    {
-        $url = trim($url);
-        $parts = parse_url($url);
-
-        if (empty($parts['scheme']) || empty($parts['host'])) {
-            return $url;
-        }
-
-        $normalized = strtolower($parts['scheme']) . '://' . strtolower($parts['host']);
-        if (!empty($parts['port'])) {
-            $normalized .= ':' . $parts['port'];
-        }
-
-        // Optionally, ensure consistent trailing slash for host-only URLs
-        if (empty($parts['path'])) {
-            $normalized .= '/';
-        }
-
-        return $normalized;
-    }
-
-    /**
      * Check if URL is in the blocked list
      */
-    public function isBlacklisted(string $currentUrl, array $blockedUrls): bool
+    public function isBlacklisted(string $clientUrl, array $blockedUrls): bool
     {
         foreach ($blockedUrls as $url) {
-            if (str_starts_with($currentUrl, $url)) {
+            if (str_starts_with($clientUrl, $url)) {
                 return true;
             }
         }
