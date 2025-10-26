@@ -39,8 +39,9 @@ class Signature
      */
     public function signData(array $data): string
     {
-        // Sort data keys to ensure consistent hashing order
-        ksort($data);
+        if (isset($data['signature'])) {
+            unset($data['signature']);
+        }
 
         // Convert array to a string (key=value pairs)
         $dataString = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -65,13 +66,14 @@ class Signature
      */
     public function verifySignature(array $data, string|null $signature): bool
     {
+        if (isset($data['signature'])) {
+            unset($data['signature']);
+        }
+
         // Check row is not null
         if (is_null($signature)) {
             return false;
         }
-
-        // Sort data keys to ensure consistent hashing order
-        ksort($data);
 
         // Convert array to a string (key=value pairs)
         $dataString = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -101,6 +103,7 @@ class Signature
                 $sorted[$field] = $data[$field];
             }
         }
+
         return $sorted;
     }
 

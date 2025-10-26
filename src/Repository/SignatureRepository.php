@@ -43,6 +43,7 @@ class SignatureRepository implements SignatureRepositoryInterface
     {
         // Set fields
         $fields = $this->config['signature_fields'][$table] ?? [];
+        $fields = array_unique(array_merge(['id'], $fields));
 
         // Check table is active for signature process
         if (in_array($table, $this->config['allowed_tables']) && !empty($fields)) {
@@ -76,9 +77,9 @@ class SignatureRepository implements SignatureRepositoryInterface
     {
         // Set fields
         $fields = $this->config['signature_fields'][$table] ?? [];
+        $fields = array_unique(array_merge(['id'], $fields));
 
         // Set where
-        $where = [];
         if (!empty($params['just_empty'])) {
             $where[] = new PredicateSet([
                 new IsNull('signature'),
@@ -89,7 +90,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         // Check table is active for signature process
         if (in_array($table, $this->config['allowed_tables']) && !empty($fields)) {
             $sql    = new Sql($this->db);
-            $select = $sql->select($table)->where($where);
+            $select = $sql->select($table);
 
             // Set limit if set
             if (!empty($params['just_empty']) && !empty($params['limit'])) {
@@ -121,6 +122,7 @@ class SignatureRepository implements SignatureRepositoryInterface
     {
         // Set fields
         $fields = $this->config['signature_fields'][$table] ?? [];
+        $fields = array_unique(array_merge(['id'], $fields, ['signature']));
 
         // Check table is active for signature process
         if (!in_array($table, $this->config['allowed_tables']) || empty($fields)) {
@@ -128,7 +130,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         }
 
         $sql    = new Sql($this->db);
-        $select = $sql->select($table)->columns(array_merge($fields, ['signature']))->where($params);
+        $select = $sql->select($table)->columns($fields)->where($params);
 
         $statement = $sql->prepareStatementForSqlObject($select);
         $result    = $statement->execute()->current();
@@ -146,6 +148,7 @@ class SignatureRepository implements SignatureRepositoryInterface
     {
         // Set fields
         $fields = $this->config['signature_fields'][$table] ?? [];
+        $fields = array_unique(array_merge(['id'], $fields, ['signature']));
 
         // Check table is active for signature process
         if (!in_array($table, $this->config['allowed_tables']) || empty($fields)) {
@@ -153,7 +156,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         }
 
         $sql    = new Sql($this->db);
-        $select = $sql->select($table)->columns(array_merge(['id'], $fields, ['signature']));
+        $select = $sql->select($table)->columns($fields);
 
         $statement = $sql->prepareStatementForSqlObject($select);
         $results   = $statement->execute();
