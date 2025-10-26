@@ -41,6 +41,7 @@ return [
             Service\CsrfService::class                     => Factory\Service\CsrfServiceFactory::class,
             Service\MessageBrokerService::class            => Factory\Service\MessageBrokerServiceFactory::class,
             Service\ModuleService::class                   => Factory\Service\ModuleServiceFactory::class,
+            Service\SystemService::class                   => Factory\Service\SystemServiceFactory::class,
             Handler\ErrorHandler::class                    => Factory\Handler\ErrorHandlerFactory::class,
             Handler\InstallerHandler::class                => Factory\Handler\InstallerHandlerFactory::class,
             Handler\Admin\Config\ListHandler::class        => Factory\Handler\Admin\Config\ListHandlerFactory::class,
@@ -49,6 +50,7 @@ return [
             Handler\Admin\Signature\UpdateHandler::class   => Factory\Handler\Admin\Signature\UpdateHandlerFactory::class,
             Handler\Admin\Slug\UpdateHandler::class        => Factory\Handler\Admin\Slug\UpdateHandlerFactory::class,
             Handler\Admin\Module\ListHandler::class        => Factory\Handler\Admin\Module\ListHandlerFactory::class,
+            Handler\Admin\System\InformationHandler::class        => Factory\Handler\Admin\System\InformationHandlerFactory::class,
         ],
     ],
     'router'          => [
@@ -223,6 +225,37 @@ return [
                                             AuthenticationMiddleware::class,
                                             AuthorizationMiddleware::class,
                                             Handler\Admin\Module\ListHandler::class
+                                        ),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'system'    => [
+                        'type'         => Literal::class,
+                        'options'      => [
+                            'route'    => '/system',
+                            'defaults' => [],
+                        ],
+                        'child_routes' => [
+                            'list' => [
+                                'type'    => Literal::class,
+                                'options' => [
+                                    'route'    => '/information',
+                                    'defaults' => [
+                                        'title'      => 'System information',
+                                        'module'     => 'core',
+                                        'section'    => 'admin',
+                                        'package'    => 'system',
+                                        'handler'    => 'information',
+                                        'permission' => 'admin-core-system-information',
+                                        'controller' => PipeSpec::class,
+                                        'middleware' => new PipeSpec(
+                                            RequestPreparationMiddleware::class,
+                                            SecurityMiddleware::class,
+                                            AuthenticationMiddleware::class,
+                                            AuthorizationMiddleware::class,
+                                            Handler\Admin\System\InformationHandler::class
                                         ),
                                     ],
                                 ],

@@ -68,5 +68,16 @@ return [
                 'admin',
             ],
         ],
+        [
+            'title'      => 'System information',
+            'module'     => 'core',
+            'section'    => 'admin',
+            'package'    => 'system',
+            'handler'    => 'information',
+            'permission' => 'admin-core-system-information',
+            'role'       => [
+                'admin',
+            ],
+        ]
     ],
 ];
