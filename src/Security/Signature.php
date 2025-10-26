@@ -87,6 +87,24 @@ class Signature
     }
 
     /**
+     * Sort $data array according to $fields order
+     *
+     * @param array $data   Associative array of data
+     * @param array $fields Ordered list of keys
+     *
+     * @return array Sorted array
+     */
+    function sortByFields(array $data, array $fields): array {
+        $sorted = [];
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $data)) {
+                $sorted[$field] = $data[$field];
+            }
+        }
+        return $sorted;
+    }
+
+    /**
      * Generates and saves a 4096-bit RSA key pair.
      *
      * This method automatically creates a private and public key in PKCS8 format

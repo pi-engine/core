@@ -56,13 +56,10 @@ class SignatureRepository implements SignatureRepositoryInterface
                 throw new RuntimeException("Record with selected ID not found in table {$table}.");
             }
 
-            // Extract specified fields
-            $data = array_intersect_key($result, array_flip($fields));
-
-            // Generate new signature
+            $data      = array_intersect_key($result, array_flip($fields));
+            $data      = $this->signature->sortByFields($data, $fields);
             $signature = $this->signature->signData($data);
 
-            // Update signature field
             $update = new Update($table);
             $update->set(['signature' => $signature])->where($params);
 
@@ -104,6 +101,7 @@ class SignatureRepository implements SignatureRepositoryInterface
 
             foreach ($result as $row) {
                 $data      = array_intersect_key($row, array_flip($fields));
+                $data      = $this->signature->sortByFields($data, $fields);
                 $signature = $this->signature->signData($data);
 
                 $update = new Update($table);
@@ -140,6 +138,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         }
 
         $data = array_intersect_key($result, array_flip($fields));
+        $data = $this->signature->sortByFields($data, $fields);
         return $this->signature->verifySignature($data, $result['signature']);
     }
 
@@ -167,6 +166,7 @@ class SignatureRepository implements SignatureRepositoryInterface
         ];
         foreach ($results as $row) {
             $data   = array_intersect_key($row, array_flip($fields));
+            $data   = $this->signature->sortByFields($data, $fields);
             $verify = $this->signature->verifySignature($data, $row['signature']);
 
             // Set result
