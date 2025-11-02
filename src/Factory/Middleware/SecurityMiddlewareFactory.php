@@ -31,7 +31,7 @@ class SecurityMiddlewareFactory implements FactoryInterface
     {
         // Get config
         $config = $container->get('config');
-        $config = array_merge($config['security'], $config['global']);
+        $config = array_merge($config['security'], $config['global'], ['cors' => $config['lmc_cors']]);
 
         return new SecurityMiddleware(
             $container->get(ResponseFactoryInterface::class),

@@ -24,43 +24,40 @@ class Headers implements ResponseSecurityInterface
     {
         return $response
             // Content Security Policy (CSP)
-            ->withHeader(
-                'Content-Security-Policy',
-                "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
-            )
+            ->withHeader('Content-Security-Policy', $this->config['header']['options']['content_security_policy'])
 
             // Strict-Transport-Security (HSTS)
-            ->withHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+            ->withHeader('Strict-Transport-Security', $this->config['header']['options']['strict_transport_security'])
 
             // X-Content-Type-Options
-            ->withHeader('X-Content-Type-Options', 'nosniff')
+            ->withHeader('X-Content-Type-Options', $this->config['header']['options']['x_content_type_options'])
 
             // X-Frame-Options
-            ->withHeader('X-Frame-Options', 'DENY')
-
-            // Referrer-Policy
-            ->withHeader('Referrer-Policy', 'no-referrer')
-
-            // Permissions-Policy
-            ->withHeader('Permissions-Policy', "geolocation=(), microphone=(), camera=(), fullscreen=(), payment=(), usb=(), vibrate=(), sync-xhr=()")
+            ->withHeader('X-Frame-Options', $this->config['header']['options']['x_frame_options'])
 
             // X-XSS-Protection
-            ->withHeader('X-XSS-Protection', '1; mode=block')
+            ->withHeader('X-XSS-Protection', $this->config['header']['options']['x_xss_protection'])
+
+            // Referrer-Policy
+            ->withHeader('Referrer-Policy', $this->config['header']['options']['referrer_policy'])
+
+            // Permissions-Policy
+            ->withHeader('Permissions-Policy', $this->config['header']['options']['permissions_policy'])
 
             // X-Permitted-Cross-Domain-Policies
             ->withHeader('X-Permitted-Cross-Domain-Policies', 'none')
 
             // Cross-Origin Resource Sharing (CORS)
-            ->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Access-Control-Allow-Methods', $this->config['method']['allow_method'])
-            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, token')
+            ->withHeader('Access-Control-Allow-Origin', $this->config['cors']['allowed_origins'])
+            ->withHeader('Access-Control-Allow-Methods', $this->config['cors']['allowed_methods'])
+            ->withHeader('Access-Control-Allow-Headers', $this->config['cors']['allowed_headers'])
             ->withHeader('Access-Control-Max-Age', '3600')
 
             // Expect-CT
             ->withHeader('Expect-CT', 'max-age=86400, enforce')
 
             // Cache-Control
-            ->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+            ->withHeader('Cache-Control', $this->config['header']['options']['cache_control'])
 
             // X-Download-Options
             ->withHeader('X-Download-Options', 'noopen')
