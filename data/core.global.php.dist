@@ -17,8 +17,8 @@ return [
         'options'        => [],
     ],
     'global'  => [
-        'sitename' => 'Lamines',
         'baseurl'  => $baseUrl,
+        'sitename' => 'Lamines',
         'platform' => 'dev-123'
     ],
     'cache'   => [
