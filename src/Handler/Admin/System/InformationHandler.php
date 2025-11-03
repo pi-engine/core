@@ -36,11 +36,12 @@ class InformationHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $information = $this->systemService->getSystemInfo();
-
         $result = [
             'result' => true,
-            'data'   => $information,
+            'data'   => [
+                'information' => $this->systemService->systemInfo(),
+                'healthCheck' => $this->systemService->healthCheck(),
+            ],
             'error'  => [],
         ];
 
