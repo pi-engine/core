@@ -37,7 +37,7 @@ class Csrf implements RequestSecurityInterface
     {
         // Check if the IP is in the whitelist
         if (
-            (bool)$this->config['xss']['ignore_whitelist'] === true
+            (bool)$this->config['csrf']['ignore_whitelist'] === true
             && isset($securityStream['ip']['data']['in_whitelist'])
             && (bool)$securityStream['ip']['data']['in_whitelist'] === true
         ) {
