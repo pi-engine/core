@@ -154,7 +154,7 @@ class InputValidation implements RequestSecurityInterface
 
                 case 'string':
                     // Allow empty strings as valid inputs
-                    $input->getValidatorChain()->attach(new StringLength(['min' => 0, 'max' => 65535]));
+                    $input->getValidatorChain()->attach(new StringLength(['min' => 0, 'max' => 4096]));
                     // Apply specific validators if applicable
                     if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
                         $input->getValidatorChain()->attach(new EmailAddress());
