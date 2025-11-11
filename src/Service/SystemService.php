@@ -36,9 +36,9 @@ class SystemService implements ServiceInterface
 
         // OS Info: name, kernel version, architecture, hostname
         $info['os'] = [
-            'name'         => php_uname(),
-            'kernel'       => php_uname('r'),
-            'architecture' => php_uname('m'),
+            'name'         => function_exists('php_uname') ? php_uname() : '-',
+            'kernel'       => function_exists('php_uname') ? php_uname('r') : '-',
+            'architecture' => function_exists('php_uname') ? php_uname('m') : '-',
             'hostname'     => gethostname(),
         ];
 
