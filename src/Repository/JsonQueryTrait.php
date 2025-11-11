@@ -59,15 +59,19 @@ trait JsonQueryTrait
      * @param string      $jsonColumn  JSON column name, default 'information'
      * @param string|null $tablePrefix Optional table prefix (e.g., 'risk.', 'log.')
      *
-     * @return Where
+     * @return ?Where  Returns null if no predicates were built
      */
-    protected function buildJsonWhere(array $conditions, array $whitelist, string $jsonColumn = 'information', ?string $tablePrefix = null): Where
-    {
+    protected function buildJsonWhere(
+        array $conditions,
+        array $whitelist,
+        string $jsonColumn = 'information',
+        ?string $tablePrefix = null
+    ): ?Where {
         $where = new Where();
 
         // Validate column and prefix early (fail-fast)
         if (!$this->isValidJsonColumn($jsonColumn) || !$this->isValidTablePrefix($tablePrefix)) {
-            return $where;
+            return null;
         }
 
         $columnQualified = ($tablePrefix ?? '') . $jsonColumn; // safe because validated
@@ -95,7 +99,7 @@ trait JsonQueryTrait
             $jsonPath = '$.' . implode('.', $segments);
 
             if (is_array($value)) {
-                // Skip empty arrays
+                // Skip empty arrays or arrays too large
                 if (count($value) === 0 || count($value) > $this->maxInArraySize) {
                     continue;
                 }
@@ -120,6 +124,7 @@ trait JsonQueryTrait
             }
         }
 
-        return $where;
+        // Return null if no predicates added
+        return count($where->getPredicates()) > 0 ? $where : null;
     }
 }
