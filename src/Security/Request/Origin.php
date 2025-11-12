@@ -40,7 +40,7 @@ class Origin implements RequestSecurityInterface
             'name'   => $this->name,
             'status' => 'successful',
             'data'   => [
-                'origin'     => $origin,
+                'origin' => $origin,
             ],
         ];
     }

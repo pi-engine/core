@@ -160,7 +160,7 @@ class Xss implements RequestSecurityInterface
                     '/<link\b[^>]*href\s*=\s*[\'"]?\s*(?:javascript|data):[^\'" >]+[\'"]?/is',
                     '/<base\b[^>]*href\s*=\s*[\'"]?\s*(?:javascript|data):[^\'" >]+[\'"]?/is',
                 ];
-            break;
+                break;
 
             case 'critical':
                 return [

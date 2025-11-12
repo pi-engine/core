@@ -10,7 +10,8 @@ use Psr\Http\Message\ServerRequestInterface;
 class Url implements ServiceInterface
 {
     public function __construct()
-    {}
+    {
+    }
 
     /**
      * Get the caller URL for a request, considering headers and IP type.

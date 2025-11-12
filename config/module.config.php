@@ -50,7 +50,7 @@ return [
             Handler\Admin\Signature\UpdateHandler::class   => Factory\Handler\Admin\Signature\UpdateHandlerFactory::class,
             Handler\Admin\Slug\UpdateHandler::class        => Factory\Handler\Admin\Slug\UpdateHandlerFactory::class,
             Handler\Admin\Module\ListHandler::class        => Factory\Handler\Admin\Module\ListHandlerFactory::class,
-            Handler\Admin\System\InformationHandler::class        => Factory\Handler\Admin\System\InformationHandlerFactory::class,
+            Handler\Admin\System\InformationHandler::class => Factory\Handler\Admin\System\InformationHandlerFactory::class,
         ],
     ],
     'router'          => [

@@ -62,9 +62,9 @@ trait JsonQueryTrait
      * @return ?Where  Returns null if no predicates were built
      */
     protected function buildJsonWhere(
-        array $conditions,
-        array $whitelist,
-        string $jsonColumn = 'information',
+        array   $conditions,
+        array   $whitelist,
+        string  $jsonColumn = 'information',
         ?string $tablePrefix = null
     ): ?Where {
         $where = new Where();

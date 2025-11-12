@@ -571,7 +571,7 @@ class UtilityService implements ServiceInterface
      * @param array $params    The input data containing updated values.
      * @param array $existing  The existing record to be updated.
      * @param array $fieldList The list of allowed fields.
-     * @param bool $clean If true, removes params not in field list. Default: false.
+     * @param bool  $clean     If true, removes params not in field list. Default: false.
      *
      * @return array The updated record with all required fields.
      *

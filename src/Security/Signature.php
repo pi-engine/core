@@ -22,6 +22,7 @@ class Signature
 
     /**
      * @param array $config Configuration containing paths for private/public keys.
+     *
      * @throws RuntimeException If keys are missing or invalid.
      */
     public function __construct(array $config)
@@ -67,7 +68,7 @@ class Signature
         }
 
         // Otherwise, load or create keys from file system
-        $keys = $this->loadOrCreateKeyPair();
+        $keys             = $this->loadOrCreateKeyPair();
         $this->privateKey = $keys['private'];
         $this->publicKey  = $keys['public'];
     }
@@ -102,6 +103,7 @@ class Signature
      * Sign data (Supports any table by passing an associative array)
      *
      * @param array $data Associative array of record data
+     *
      * @return string Base64 encoded signature
      * @throws RuntimeException
      */
@@ -123,6 +125,7 @@ class Signature
      *
      * @param array       $data      The original data array
      * @param string|null $signature The signature stored in the database
+     *
      * @return bool True if signature is valid, false otherwise
      * @throws RuntimeException
      */
@@ -148,6 +151,7 @@ class Signature
      *
      * @param array $data   Associative array of data
      * @param array $fields Ordered list of keys
+     *
      * @return array Sorted array
      */
     public function sortByFields(array $data, array $fields): array
@@ -167,6 +171,7 @@ class Signature
      *
      * @param string $privateKeyPath
      * @param string $publicKeyPath
+     *
      * @return void
      * @throws RuntimeException If key generation or file saving fails.
      */
