@@ -136,10 +136,6 @@ class Url implements ServiceInterface
             $normalized .= ':' . $parts['port'];
         }
 
-        if (empty($parts['path'])) {
-            $normalized .= '/';
-        }
-
         return $normalized;
     }
 }
