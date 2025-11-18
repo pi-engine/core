@@ -124,9 +124,11 @@ class Ip implements ServiceInterface
     public function isLocalIp(string $ip): bool
     {
         // Check against known local/private ranges
-        foreach ($this->config['local_ranges'] as $range) {
-            if (str_starts_with($ip, $range)) {
-                return true;
+        if (isset($this->config['local_ranges']) && !empty($this->config['local_ranges'])) {
+            foreach ($this->config['local_ranges'] as $range) {
+                if (str_starts_with($ip, $range)) {
+                    return true;
+                }
             }
         }
 
@@ -143,9 +145,11 @@ class Ip implements ServiceInterface
      */
     public function isInternalIp(string $ip): bool
     {
-        foreach ($this->config['internal_ranges'] as $range) {
-            if (str_starts_with($ip, $range)) {
-                return true;
+        if (isset($this->config['internal_ranges']) && !empty($this->config['internal_ranges'])) {
+            foreach ($this->config['internal_ranges'] as $range) {
+                if (str_starts_with($ip, $range)) {
+                    return true;
+                }
             }
         }
 
