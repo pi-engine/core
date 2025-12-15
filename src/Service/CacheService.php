@@ -283,6 +283,12 @@ class CacheService implements ServiceInterface
         // Setup redis
         $redis = new Redis();
         $redis->connect($this->config['options']['server']['host'], (int)$this->config['options']['server']['port']);
+        if (isset($this->config['options']['password']) && !empty($this->config['options']['password'])) {
+            $redis->auth($this->config['options']['password']);
+        }
+        if (isset($this->config['options']['server']['database']) && is_numeric($this->config['options']['server']['database'])) {
+            $redis->select((int)$this->config['options']['server']['database']);
+        }
 
         // Get keys
         $keys = $redis->keys(sprintf('%s:*', $this->config['options']['namespace']));
@@ -340,6 +346,14 @@ class CacheService implements ServiceInterface
         // Setup redis
         $redis = new Redis();
         $redis->connect($this->config['options']['server']['host'], (int)$this->config['options']['server']['port']);
+        if (isset($this->config['options']['password']) && !empty($this->config['options']['password'])) {
+            $redis->auth($this->config['options']['password']);
+        }
+        if (isset($this->config['options']['server']['database']) && is_numeric($this->config['options']['server']['database'])) {
+            $redis->select((int)$this->config['options']['server']['database']);
+        }
+
+        // Set persist
         $redis->persist($key);
     }
 }
