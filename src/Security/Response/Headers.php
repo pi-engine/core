@@ -52,10 +52,11 @@ class Headers implements ResponseSecurityInterface
             ->withHeader('Cross-Origin-Embedder-Policy', 'require-corp')
             ->withHeader('Cross-Origin-Opener-Policy', 'same-origin')
             ->withHeader('Cross-Origin-Resource-Policy', 'same-origin')
-            //->withHeader('Access-Control-Allow-Origin', $this->config['cors']['allowed_origins'])
-            //->withHeader('Access-Control-Allow-Methods', $this->config['cors']['allowed_methods'])
-            //->withHeader('Access-Control-Allow-Headers', $this->config['cors']['allowed_headers'])
-            //->withHeader('Access-Control-Max-Age', '3600')
+            ->withHeader('Access-Control-Allow-Origin', $this->config['cors']['allowed_origins'])
+            ->withHeader('Access-Control-Allow-Credentials', 'true')
+            ->withHeader('Access-Control-Allow-Methods', $this->config['cors']['allowed_methods'])
+            ->withHeader('Access-Control-Allow-Headers', $this->config['cors']['allowed_headers'])
+            ->withHeader('Access-Control-Max-Age', '3600')
 
             // Expect-CT
             ->withHeader('Expect-CT', 'max-age=86400, enforce')
