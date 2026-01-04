@@ -65,10 +65,10 @@ class Origin implements RequestSecurityInterface
      * Determine the overall request origin type based on both IP and URL data.
      *
      * Priority logic:
-     *  If either IP or URL is local → "local"
-     *  Else if either IP or URL is internal → "internal"
-     *  Else if both are public → "public"
-     *  Otherwise, → "unknown"
+     *  First check URL type; if not 'public', use URL type
+     *  If URL type is 'public', check IP type
+     *  If URL type is 'unknown' or not detectable, use IP type
+     *  Otherwise → "unknown"
      *
      * @param $ipType
      * @param $urlType
@@ -81,17 +81,33 @@ class Origin implements RequestSecurityInterface
         $ipType  = strtolower((string)$ipType);
         $urlType = strtolower((string)$urlType);
 
-        // Priority rules
-        if ($ipType === 'local' || $urlType === 'local') {
-            return 'local';
+        // First priority: URL type determines if not 'public'
+        if ($urlType === 'local' || $urlType === 'internal') {
+            return $urlType;
         }
 
-        if ($ipType === 'internal' || $urlType === 'internal') {
-            return 'internal';
+        // If URL type is 'public', check IP type for more specific classification
+        if ($urlType === 'public') {
+            // IP type can override 'public' to be more restrictive
+            if ($ipType === 'local' || $ipType === 'internal') {
+                return $ipType;
+            }
+            // Both are public
+            if ($ipType === 'public') {
+                return 'public';
+            }
         }
 
-        if ($ipType === 'public' && $urlType === 'public') {
-            return 'public';
+        // If URL type is 'unknown' or empty, use IP type
+        if ($urlType === 'unknown' || $urlType === '') {
+            if (in_array($ipType, ['local', 'internal', 'public'])) {
+                return $ipType;
+            }
+        }
+
+        // If we have a valid IP type but URL type wasn't helpful
+        if (in_array($ipType, ['local', 'internal', 'public'])) {
+            return $ipType;
         }
 
         return 'unknown';
